@@ -5,4 +5,4 @@ This project is specifically intended to be used for assessing dicom images of h
 
 
 #Contributers:
-Falon Scheers, David Turner
+Falon Scheers, David Turner, Andrew Whittle
