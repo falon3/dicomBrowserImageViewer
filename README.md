@@ -11,7 +11,7 @@ $ flask/bin/pip install flask
 ```
     
 # to setup with apache
-edit the apache config file (ie. /etc/apache2/apache2.conf) with something like the following
+edit the apache config file (ie. /etc/apache2/apache2.conf) to add with something like the following
 
 ```
 <VirtualHost *:8000>
@@ -27,7 +27,14 @@ edit the apache config file (ie. /etc/apache2/apache2.conf) with something like 
     </Directory>
 </VirtualHost>
 ```
-
+add this line to the ports.conf file in the same directory
+```
+Listen 8000
+```
+Then create a symbolic link for apache to this project directory from the command line:
+```
+$ sudo ln -s /var/www/html/dicom <location of this project>
+```
 and then restart apache, ie.
 
 ```
