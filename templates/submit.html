@@ -2,8 +2,14 @@
 {% block content %}
 
     <div id="canvas">
-        <img id="viewer" /><br />
-        <span id="currentImage"></span> / <span id="maxImage"></span>
+        <div id="viewerContainer">
+            <img id="viewer" /><br />
+            <div id="viewerControls">
+                <button id="previous">&lt;</button>
+                <span id="currentImage"></span> / <span id="maxImage"></span>
+                <button id="next">&gt;</button>
+            </div>
+        </div>
         <div id="preCachedImages">
             {% for i in range(1,355) %}
                 <img src="{{ i }}" />
