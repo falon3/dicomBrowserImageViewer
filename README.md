@@ -22,6 +22,7 @@ edit the apache config file (ie. /etc/apache2/apache2.conf) to add with somethin
     <Directory /var/www/html/dicom>
         WSGIProcessGroup app
         WSGIApplicationGroup %{GLOBAL}
+        WSGIScriptReloading On
         Order deny,allow
         Allow from all
     </Directory>
