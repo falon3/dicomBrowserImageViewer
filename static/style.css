@@ -97,4 +97,17 @@ form input[type=submit]{
     border: 0;
     cursor: pointer;
     text-align: center;
-} 
+}
+
+div#canvas {
+    width: 100%;
+    text-align: center;
+}
+
+div#preCachedImages {
+    display: none;
+}
+
+img#viewer {
+    cursor: crosshair;
+}

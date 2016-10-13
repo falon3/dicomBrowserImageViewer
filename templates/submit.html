@@ -1,24 +1,14 @@
-<html>
-    <head>
-        <title>Handle POST requests with Flask</title>
-        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    </head>
-    <body>
-        <div id="container">
-            <div class="title">
-                <h1>POST request with Flask</h1>
-            </div>
-            <div id="content">
-                Hello you made a post <strong>!
-            </div>
-            
-            <code><pre>
-@app.route('/api/upload/', methods=['POST'])
-def upload():
-    name=request.form['filename']
-    return render_template('submit.html', name=name)
-            </pre></code>
+{% extends 'base.html' %}
+{% block content %}
+
+    <div id="canvas">
+        <img id="viewer" /><br />
+        <span id="currentImage"></span> / <span id="maxImage"></span>
+        <div id="preCachedImages">
+            {% for i in range(1,355) %}
+                <img src="{{ i }}" />
+            {% endfor %}
         </div>
-        </div>
-    </body>
-</html>
+    </div>
+
+{% endblock %}

@@ -5,12 +5,12 @@ app = Flask(__name__)
 
 @app.route('/api/')
 def index():
-    return render_template('upload.html')
+    return render_template('upload.html', title='Upload DICOM')
 
 @app.route('/api/upload/', methods=['POST'])
 def upload():
     #pass (upload and convert dicom)
-    return render_template('submit.html')
+    return render_template('submit.html', title='DICOM Viewer')
 
 @app.route('/api/upload/<int:img_id>', methods=['GET'])
 def get_image(img_id):

@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Handle POST requests with Flask</title>
+        {% include 'styles.html' %}
+        {% include 'scripts.html' %}
+    </head>
+    <body>
+        <div id="container">
+            <div class="title">
+                <h1>{{ title }}</h1>
+            </div>
+            <div id="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </body>
+</html>
