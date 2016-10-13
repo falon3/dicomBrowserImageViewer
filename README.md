@@ -33,8 +33,18 @@ Listen 8000
 ```
 Then create a symbolic link for apache to this project directory from the command line:
 ```
-$ sudo ln -s /var/www/html/dicom <location of this project>
+$ sudo ln -s <location of this project> /var/www/html/dicom
 ```
+You MAY need to change the permissions of where your project is located so that apache can access it    
+with something like:
+```
+$ sudo chgrp -R www-data <this repo folder>
+```
+and also giving any higher directory this is saved in executable permision:
+```
+$ sudo chmod o+x <User folder>
+```
+    
 and then restart apache, ie.
 
 ```
