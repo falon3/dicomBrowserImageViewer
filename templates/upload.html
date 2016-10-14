@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-    <form method="post" action="{{ url_for('upload') }}">
-        <label for="filename"> Please enter your image name: </label>
-        <input type="text"  name="filename" /><br/>
-        <input type="file" name=filename>
+<form enctype="multipart/form-data" method="post" action="{{ url_for('upload') }}">
+        <label for="filename"> Please enter a name for the set of images: </label>
+        <input type="text" name= "filename" id="filename" /><br/>
+        <input type="file" name= "imagefile" id="imagefile" >
         <input type="submit" value="Upload" />
     </form>
 {% endblock %}
