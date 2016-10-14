@@ -2,19 +2,19 @@ RADIUS = 3;
 
 $(document).ready(function(){
 
-    var points = new Array();
-    var mousePoint = {x: 0, y: 0};
     var images = $("#preCachedImages img");
-    var currentImage = 0;
-    var closePointId = -1;
-    var dragging = false;
-    
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
-    
     if(images.length == 0){
         return;
     }
+
+    var points = new Array();
+    var mousePoint = {x: 0, y: 0};
+    var currentImage = 0;
+    var closePointId = -1;
+    var dragging = false;
+
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
     
     // Initialize the points (this will probably be done via an api call eventually)
     _.each(images, function(img, i){
