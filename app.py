@@ -4,7 +4,7 @@ from flaskext.mysql import MySQL
 import subprocess
 import fnmatch
 import settings
-from os import listdir
+from os import listdir, makedirs, path
 
 mysql = MySQL()
 app = Flask(__name__)
@@ -26,6 +26,8 @@ def upload():
         
     # save locally temporarily to convert from dicom to jpg format
     tempsaved = 'temp/'
+    if not path.exists(tempsaved):
+        makedirs(tempsaved)
     imagefile.save(tempsaved+setname)
     im_list = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
     num_images = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
