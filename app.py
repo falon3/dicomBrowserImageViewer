@@ -25,7 +25,7 @@ def upload():
     imagefile = request.files.get('imagefile', '')
         
     # save locally temporarily to convert from dicom to jpg format
-    tempsaved = 'tempfiles/'
+    tempsaved = 'temp/'
     imagefile.save(tempsaved+setname)
     im_list = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
     num_images = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
