@@ -3,6 +3,7 @@ RADIUS = 3;
 $(document).ready(function(){
 
     var images = $("#preCachedImages img");
+    $("#curved").prop("checked", true);
     if(images.length == 0){
         return;
     }
@@ -12,6 +13,7 @@ $(document).ready(function(){
     var currentImage = 0;
     var closePointId = -1;
     var dragging = false;
+    var segments = 16;
 
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -33,7 +35,6 @@ $(document).ready(function(){
         // Canvas
         canvas.width = $("#slice").width();
         canvas.height = $("#slice").height();
-        context.clearRect(0, 0, canvas.width, canvas.height);
         if(canvas.width == 0){
             // Image wasn't done loading yet, try again later...
             _.defer(render);
@@ -53,7 +54,7 @@ $(document).ready(function(){
             }
         });
         
-        context.drawCurve(curvePoints, 0.5, false, 16);
+        context.drawCurve(curvePoints, 0.5, false, segments);
         context.strokeStyle = 'red';
         context.lineWidth = 2;
         context.stroke();
@@ -115,6 +116,16 @@ $(document).ready(function(){
         e.preventDefault();
     });
     
+    $("#curved").change(function(e){
+        if($("#curved").is(":checked")){
+            segments = 16;
+        }
+        else{
+            segments = 1;
+        }
+        render();
+    });
+    
     // Mouse moving
     canvas.addEventListener('mousemove', function(e){
         coords = canvas.relMouseCoords(e);
@@ -141,6 +152,14 @@ $(document).ready(function(){
         render();
     });
     
+    // Leaving the canvas
+    canvas.addEventListener('mouseleave', function(e){
+        dragging = false;
+        mousePoint = {x: -1000, y: -1000};
+        render();
+    });
+    
+    // Releasing the mouse
     canvas.addEventListener('mouseup', function(e){
         dragging = false;
         render();

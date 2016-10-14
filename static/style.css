@@ -115,12 +115,36 @@ div#preCachedImages {
 div#viewerContainer {
     display: inline-block;
     position: relative;
+    background: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
 
-div#viewerControls {
-    width: 100%;
+div#topViewer {
+    min-width: 500px;
+    text-align: left;
+    padding: 15px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+div#topViewer > * {
+    vertical-align: middle;
+}
+
+div#middleViewer {
+    position: relative; 
+    display: inline-block;
+    margin: 15px;
+}
+
+div#bottomViewer {
+    min-width: 500px;
     height: 44px;
     line-height: 44px;
+    padding: 15px;
+    border-top: 1px solid #DDDDDD;
 }
 
 canvas#canvas {
