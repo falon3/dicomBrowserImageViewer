@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div id="canvas">
+    <div id="viewer">
         <div id="viewerContainer">
-            <img id="viewer" /><br />
+            <canvas id="canvas"></canvas>
+            <img id="slice" /><br />
             <div id="viewerControls">
                 <button id="previous">&lt;</button>
                 <span id="currentImage"></span> / <span id="maxImage"></span>

@@ -103,7 +103,7 @@ button:disabled {
     background: #999999;
 }
 
-div#canvas {
+div#viewer {
     width: 100%;
     text-align: center;
 }
@@ -114,15 +114,20 @@ div#preCachedImages {
 
 div#viewerContainer {
     display: inline-block;
+    position: relative;
 }
 
 div#viewerControls {
     width: 100%;
-    position: relative;
+    height: 44px;
+    line-height: 44px;
 }
 
-img#viewer {
-    cursor: crosshair;
+canvas#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: none;
 }
 
 #previous {
