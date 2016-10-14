@@ -34,6 +34,11 @@ $(document).ready(function(){
         canvas.width = $("#slice").width();
         canvas.height = $("#slice").height();
         context.clearRect(0, 0, canvas.width, canvas.height);
+        if(canvas.width == 0){
+            // Image wasn't done loading yet, try again later...
+            _.defer(render);
+            return;
+        }
         
         var curvePoints = new Array();
         if(!dragging){
