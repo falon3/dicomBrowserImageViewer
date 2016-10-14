@@ -47,7 +47,8 @@ def get_image(img_id):
        return send_file(filename)
 
 #TODO make this page auto routed to from the "/" page
-#use test person Admin, pass: admin for now
+#use test person Admin, pass: admin for now, added this into users table in database
+#such as: http://127.0.0.1:5000/api/authenticate?name=Admin&password=admin 
 @app.route("/api/authenticate")
 def Authenticate():
     username = request.args.get('name')
