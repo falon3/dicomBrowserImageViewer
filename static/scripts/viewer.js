@@ -1,9 +1,13 @@
+RADIUS = 3;
+
 $(document).ready(function(){
 
     var points = new Array();
     var mousePoint = {x: 0, y: 0};
     var images = $("#preCachedImages img");
     var currentImage = 0;
+    var closePointId = -1;
+    var dragging = false;
     
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -29,12 +33,19 @@ $(document).ready(function(){
         // Canvas
         canvas.width = $("#slice").width();
         canvas.height = $("#slice").height();
-        
         context.clearRect(0, 0, canvas.width, canvas.height);
+        
         var curvePoints = new Array();
-        _.each(points[currentImage], function(point){
+        if(!dragging){
+            closePointId = -1;
+        }
+        _.each(points[currentImage], function(point, i){
             curvePoints.push(point.x);
             curvePoints.push(point.y);
+            // While we are here, check distance to points
+            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*2){
+                closePointId = i;
+            }
         });
         
         context.drawCurve(curvePoints, 0.5, false, 16);
@@ -42,14 +53,18 @@ $(document).ready(function(){
         context.lineWidth = 2;
         context.stroke();
         _.each(points[currentImage], function(point, i){
+            var radius = RADIUS;
+            if(i == closePointId){
+                radius *= 2;
+            }
             context.beginPath();
-            context.arc(point.x, point.y, 3, 0, 2 * Math.PI, false);
+            context.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
             context.fillStyle = 'red';
             context.fill();
         });
         
         context.beginPath();
-        context.arc(mousePoint.x, mousePoint.y, 3, 0, 2 * Math.PI, false);
+        context.arc(mousePoint.x, mousePoint.y, RADIUS, 0, 2 * Math.PI, false);
         context.fillStyle = 'red';
         context.fill();
         
@@ -95,15 +110,34 @@ $(document).ready(function(){
         e.preventDefault();
     });
     
+    // Mouse moving
     canvas.addEventListener('mousemove', function(e){
         coords = canvas.relMouseCoords(e);
         mousePoint = coords;
+        if(dragging){
+            points[currentImage][closePointId] = mousePoint;
+        }
         render();
     });
     
-    canvas.addEventListener('click', function(e){
+    // Clicking to add a point
+    canvas.addEventListener('mousedown', function(e){
         coords = canvas.relMouseCoords(e);
-        points[currentImage].push(coords);
+        dragging = true;
+        if(closePointId != -1){
+            
+        }
+        else{
+            // Adding new point
+            points[currentImage].push(coords);
+            closePointId = points[currentImage].length - 1;
+        }
+        
+        render();
+    });
+    
+    canvas.addEventListener('mouseup', function(e){
+        dragging = false;
         render();
     });
 
