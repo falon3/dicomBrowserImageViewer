@@ -1,7 +1,7 @@
 database = dict(
     user = 'falon',
-    password = 'rootpass',
-    db_name = 'dcmviewer',
+    passwd = 'rootpass',
+    db = 'dcmviewer',
     host = 'localhost',
 )
 
@@ -9,8 +9,15 @@ database = dict(
  to run this query in mySQL:
 
 mysql>
-grant all privileges on <db_name>.* to <user>@<host> 
-identified by <password> 
-with grant option;
+GRANT ALL privileges ON <db>.* TO <user>@<host> 
+identified by <passwd> 
+WITH GRANT OPTION;
+
+
+MAY ALSO need to login as root on <db> to mysql and give necessary GLOBAL privileges
+so that uploading can happen for this user with these queries:
+
+GRANT ALL ON *.* TO <user>@<host>;
+GRANT SELECT, INSERT ON *.* TO <user>@<host>;
 
 '''
