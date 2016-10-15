@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div id="canvas">
+    <div id="viewer">
         <div id="viewerContainer">
-            <img id="viewer" /><br />
-            <div id="viewerControls">
+            <div id="topViewer">
+                Show Curved Lines: <input id="curved" type="checkbox" checked /> 
+            </div>
+            <div id="middleViewer">
+                <canvas id="canvas"></canvas>
+                <img id="slice" />
+            </div>
+            <div id="bottomViewer">
                 <button id="previous">&lt;</button>
                 <span id="currentImage"></span> / <span id="maxImage"></span>
                 <button id="next">&gt;</button>
