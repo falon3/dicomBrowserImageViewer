@@ -1,17 +1,18 @@
 #!flask/bin/python
-from flask import Flask, abort, send_file, render_template, request, url_for
+from flask import Flask, abort, send_file, render_template, request, url_for, make_response
 from flaskext.mysql import MySQL
 import hashlib, uuid
 import subprocess
 import fnmatch
 import settings
 import glob
+import datetime
 from base64 import decodestring
 from os import listdir, makedirs, path, remove
 
 mysql = MySQL()
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_USERS'] = settings.database['user']
+app.config['MYSQL_DATABASE_USER'] = settings.database['user']
 app.config['MYSQL_DATABASE_PASSWORD'] = settings.database['passwd']
 app.config['MYSQL_DATABASE_DB'] = settings.database['db']
 app.config['MYSQL_DATABASE_HOST'] = settings.database['host']
@@ -115,8 +116,16 @@ def get_image(img_id):
 @app.route("/api/authenticate")
 def Authenticate():
     # Currently using GET arguments.  This should be changed to a POST request at some point
-    username = request.args.get('name')
+    username = request.cookies.get('username')
+    hashed_password = request.cookies.get('password')
+    
+    if(username is None):
+        username = request.args.get('name')
+
     password = request.args.get('password')
+    print username
+    if(username is None):
+        username = ""
 
     cursor = mysql.connect().cursor()
     cursor.execute("SELECT password, salt from users where name = %s", (username))
@@ -128,11 +137,18 @@ def Authenticate():
     if data is None:
         return "Username or Password is wrong"
     else:
-        salt = data[1]
-        hashed_password = hashlib.sha512(password + salt).hexdigest()
+        if(hashed_password is None):
+            salt = data[1]
+            hashed_password = hashlib.sha512(password + salt).hexdigest()
         if data[0] == hashed_password:
-            response.set_cookie('username', value=username)
-            return "Logged in successfully"
+            expire_date = datetime.datetime.now()
+            expire_date = expire_date + datetime.timedelta(days=30)
+            response = make_response("Logged in successfully")
+            # TODO: Might add user auth tokens instead of storing the hashed password in the cookie
+            # to furthe bolster security 
+            response.set_cookie('username', username, expires=expire_date)
+            response.set_cookie('password', hashed_password, expires=expire_date)
+            return response
         else:
             return "Username or Password is wrong"
 

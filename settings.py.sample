@@ -2,8 +2,8 @@
 
 database = dict(
     user = '',
-    password = '',
-    db_name = '',
+    passwd = '',
+    db = '',
     host = '',
 )
 
