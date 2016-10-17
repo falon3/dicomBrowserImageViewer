@@ -1,6 +1,7 @@
 #!flask/bin/python
 from flask import Flask, abort, send_file, render_template, request, url_for
 from flaskext.mysql import MySQL
+import hashlib, uuid
 import subprocess
 import fnmatch
 import settings
@@ -8,7 +9,7 @@ from os import listdir, makedirs, path
 
 mysql = MySQL()
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_USERS'] = settings.database['user']
+app.config['MYSQL_DATABASE_USER'] = settings.database['user']
 app.config['MYSQL_DATABASE_PASSWORD'] = settings.database['password']
 app.config['MYSQL_DATABASE_DB'] = settings.database['db_name']
 app.config['MYSQL_DATABASE_HOST'] = settings.database['host']
@@ -55,13 +56,23 @@ def get_image(img_id):
 def Authenticate():
     username = request.args.get('name')
     password = request.args.get('password')
+    
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT * from users where name='" + username + "' and password='" + password + "'")
+    cursor.execute("SELECT password, salt from users where name = %s", (username))
+    
+    #salt = uuid.uuid4().hex ## will need this to create accounts at some point
+
     data = cursor.fetchone()
+    print data
     if data is None:
-     return "Username or Password is wrong"
+        return "Username or Password is wrong"
     else:
-     return "Logged in successfully"
+        salt = data[1]
+        hashed_password = hashlib.sha512(password + salt).hexdigest()
+        if data[0] == hashed_password:
+            return "Logged in successfully"
+        else:
+            return "Username or Password is wrong"
 
 if __name__ == '__main__':
     host="localhost",

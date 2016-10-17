@@ -1,6 +1,6 @@
 database = dict(
-    user = 'falon',
-    password = 'rootpass',
+    user = 'root',
+    password = 'root',
     db_name = 'dcmviewer',
     host = 'localhost',
 )

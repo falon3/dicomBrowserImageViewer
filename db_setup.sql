@@ -9,6 +9,7 @@ create table users (
 	id INT(11) NOT NUll AUTO_INCREMENT, 
 	name VARCHAR(50) NOT NULL Unique,
 	password VARCHAR(256) NOT NULL,
+	salt VARCHAR(256) NOT NULL,
 	email VARCHAR(50),
 	Primary Key (id)
 );

@@ -9,6 +9,7 @@ inside of project directory run the following commands
 $ virtualenv flask
 $ flask/bin/pip install flask
 $ pip install flask-mysql
+
 ```
     
 # to setup with apache
@@ -37,7 +38,7 @@ Then create a symbolic link for apache to this project directory from the comman
 ```
 $ sudo ln -s <location of this project> /var/www/html/dicom
 ```
-You MAY need to change the permissions of where your project is located so that apache can access it    
+You MAY need to change the permissions of where your project is located so that apache can access it
 with something like:
 ```
 $ sudo chgrp -R www-data <this repo folder>
