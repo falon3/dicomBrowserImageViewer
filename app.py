@@ -1,12 +1,14 @@
 #!flask/bin/python
-from flask import Flask, abort, send_file, render_template, request, url_for
+from flask import Flask, abort, send_file, render_template, request, url_for, redirect
 from flaskext.mysql import MySQL
 import subprocess
 import fnmatch
 import settings
 import glob
-from base64 import decodestring
 from os import listdir, makedirs, path, remove
+from base64 import decodestring
+from io import BytesIO
+import fnmatch
 
 mysql = MySQL()
 app = Flask(__name__)
@@ -33,6 +35,7 @@ def upload():
         makedirs(tempsaved)
     imagefile.save(tempsaved+setname)
     convert = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
+    set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
     if convert != 0:
         return "Unable to convert image, press back and try a DICOM format"
     
@@ -61,8 +64,9 @@ def upload():
     cursor.execute("SELECT id FROM image_sets WHERE name='" + setname + "'") 
     current_setid = cursor.fetchone()[0]  
     
-    # save all in set as blobs in images table in database
-    for picture in glob.glob(tempsaved+'*.jpg'):
+    # save all in set as blobs in images table in database in correct order
+    for index in range(set_size):
+        picture = tempsaved + setname + "-" + str(index) + ".jpg"
         subprocess.call(['chmod', '777', picture])
         picture = path.abspath(picture)
         cursor.execute(
@@ -76,34 +80,33 @@ def upload():
     conn.close()
 
     # return image id and number of images in set
-    return render_template('submit.html', title='DICOM Viewer', setID=current_setid )
-
-# handles getting jpg files from a set in database to be rendered in browser
+    return redirect("/api/viewset/"+str(current_setid), code=302)
+    
+# gets image set details from database to pass to template
 @app.route('/api/viewset/<int:set_id>', methods=['GET'])
 def query_set(set_id):
     # make new db connection 
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT image FROM images WHERE set_id='%s'", set_id)
-    img_set = cursor.fetchall()[0]
-
-    #TODO: FIXXXXX THIS DOESN'T REALLY WORK YET
-    counter = 0
-    for img in img_set:
-        f = open("temp"+str(counter)+".jpg","w")
-        f.write(decodestring(img))
-        f.close()
-        counter+=1
-
-    return send_file("temp0.jpg")
-    conn.close()
-
+    cursor.execute("SELECT id FROM images WHERE set_id='%s'", set_id)
+    img_list = cursor.fetchall()
+    first = img_list[0][0]
+    size = len(img_list)
+    print(img_list, size)
+    
+    return render_template('submit.html', title='DICOM Viewer', first = first, size = size)
+    
 @app.route('/api/upload/<int:img_id>', methods=['GET'])
 def get_image(img_id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    
     try:
+        cursor.execute("SELECT image FROM images WHERE id='%s'", img_id)
         #get image set from database
-        filename = 'images/IM_0011-'+ str(img_id) + '.jpg'
-        return send_file(filename)
+        img = cursor.fetchone()[0]
+        #filename = 'images/IM_0011-'+ str(img_id) + '.jpg'
+        return send_file(BytesIO(img), mimetype='image/jpg')
     except:
         filename = 'images/error.gif'
         return send_file(filename)
