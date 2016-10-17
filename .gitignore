@@ -1,3 +1,4 @@
 flask/
 temp/
+settings.py
 *.pyc
