@@ -92,20 +92,18 @@ def query_set(set_id):
     img_list = cursor.fetchall()
     first = img_list[0][0]
     size = len(img_list)
-    print(img_list, size)
     
     return render_template('submit.html', title='DICOM Viewer', first = first, size = size)
     
 @app.route('/api/upload/<int:img_id>', methods=['GET'])
 def get_image(img_id):
+    # make new db connection 
     conn = mysql.connect()
-    cursor = conn.cursor()
-    
+    cursor = conn.cursor()    
     try:
-        cursor.execute("SELECT image FROM images WHERE id='%s'", img_id)
         #get image set from database
+        cursor.execute("SELECT image FROM images WHERE id='%s'", img_id)        
         img = cursor.fetchone()[0]
-        #filename = 'images/IM_0011-'+ str(img_id) + '.jpg'
         return send_file(BytesIO(img), mimetype='image/jpg')
     except:
         filename = 'images/error.gif'
