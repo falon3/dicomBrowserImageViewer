@@ -65,13 +65,14 @@ form label{
     display: block;
     margin-bottom: 5px;
 }
-form input[type=text]{
+form input {
     border: 1px solid #aaa;
     border-radius: 2px;
     box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
     box-sizing: border-box;
     padding: 5px;
-    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     outline: 0;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
@@ -101,6 +102,14 @@ form input[type=submit], button {
 
 button:disabled {
     background: #999999;
+}
+
+#logout {
+    float: right;
+}
+
+#logout > a {
+    color: white;
 }
 
 div#viewer {
@@ -160,4 +169,24 @@ canvas#canvas {
 
 #next {
     float: right;
+}
+
+.error {
+    background-repeat: no-repeat !important;
+    background-position: 5px center !important;
+    margin: 10px 0;
+    padding:10px 5px 10px 40px;
+    position: relative;
+    border: 1px solid #D50013;
+    background-image:url('error.png');
+    color: #D50013 !important;
+    background-color: #FEB8B8 !important;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+
+.error a, .error a:visited, .inlineError a, .inlineError a:visited {
+    color: #D50013 !important;
+    font-weight: bold;
 }

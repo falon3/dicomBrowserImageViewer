@@ -17,8 +17,8 @@
             </div>
         </div>
         <div id="preCachedImages">
-            {% for i in range(0,255) %}
-                <img src="{{ i }}" />
+            {% for i in range(first, first + size) %}
+                <img src="/api/upload/{{ i }}" />
             {% endfor %}
         </div>
     </div>

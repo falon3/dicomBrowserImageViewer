@@ -9,9 +9,18 @@
     <body>
         <div id="container">
             <div class="title">
-                <h1>{{ title }}</h1>
+                <h1>{{ title }} 
+                    {% if g.user != None %}
+                        <div id="logout">
+                            <a href="/api/logout">Logout</a>
+                        </div>
+                    {% endif %}
+                </h1>
             </div>
             <div id="content">
+                {% if error != "" and error != null %}
+                    <div class="error">{{ error }}</div>
+                {% endif %}
                 {% block content %}
                 {% endblock %}
             </div>
