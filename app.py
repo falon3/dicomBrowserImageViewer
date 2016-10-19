@@ -80,9 +80,9 @@ def upload():
     # save all in set as blobs in images table in database in correct order
     for index in range(set_size):
         picture = tempsaved + setname + "-" + str(index) + ".jpg"
-        subprocess.call(['chmod', '777', picture])
         picture = path.abspath(picture)
-        print picture
+        subprocess.call(['chmod', '777', picture])
+
         cursor.execute(
             "INSERT INTO images (id, set_id, image)"
             "VALUES (NULL, %s, LOAD_FILE(%s))", (current_setid, picture) 
