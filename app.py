@@ -21,24 +21,23 @@ app.config['MYSQL_DATABASE_PASSWORD'] = settings.database['passwd']
 app.config['MYSQL_DATABASE_DB'] = settings.database['db']
 app.config['MYSQL_DATABASE_HOST'] = settings.database['host']
 mysql.init_app(app)
-#mysql.connect(settings.database).autocommit(True)
 
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = getLoggedInUser()
         if user is None:
-            return redirect('/api/authenticate')
+            return redirect('/authenticate')
         return f(*args, **kwargs)
     return decorated_function
 
-@app.route('/api/')
+@app.route('/')
 @login_required
 def index():
     return render_template('upload.html', title='Upload DICOM')
 
 # handles uploading Dicom files, converting into jpg format and storing into database
-@app.route('/api/upload/', methods=['POST'])
+@app.route('/upload/', methods=['POST'])
 @login_required
 def upload():
     setname = request.form.get('filename')
@@ -73,7 +72,8 @@ def upload():
             return "Duplicate image set name for this user, press back and try again"
             
                                                                        
-    # get current image_set id                                                  
+    # get current image_set id    
+    
     cursor.execute("SELECT id FROM image_sets WHERE name='" + setname + "'") 
     current_setid = cursor.fetchone()[0]  
     
@@ -94,10 +94,10 @@ def upload():
     conn.close()
 
     # return image id and number of images in set
-    return redirect("/api/viewset/"+str(current_setid), code=302)
+    return redirect("/viewset/"+str(current_setid), code=302)
     
 # gets image set details from database to pass to template
-@app.route('/api/viewset/<int:set_id>', methods=['GET'])
+@app.route('/viewset/<int:set_id>', methods=['GET'])
 @login_required
 def query_set(set_id):
     # make new db connection 
@@ -110,7 +110,7 @@ def query_set(set_id):
     
     return render_template('submit.html', title='DICOM Viewer', first = first, size = size)
     
-@app.route('/api/upload/<int:img_id>', methods=['GET'])
+@app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
 def get_image(img_id):
     # make new db connection 
@@ -125,54 +125,52 @@ def get_image(img_id):
         filename = 'images/error.gif'
         return send_file(filename)
 
-@app.route("/api/authenticate", methods=['GET', 'POST'])
+@app.route("/authenticate", methods=['GET', 'POST'])
 def Authenticate():
     user = getLoggedInUser()
     
     if user != None:
         # Already logged in!
-        redirect("/api/")
+        return redirect("/")
 
-    # Currently using GET arguments.  This should be changed to a POST request at some point
     username = request.form.get('username')
     password = request.form.get('password')
     
     if(username is None and password is None):
         return render_template('login.html', title='Login')
-    
-    if(username is None):
-        username = ""
-    if(password is None):
-        password = ""
 
     cursor = mysql.connect().cursor()
-    cursor.execute("SELECT password, salt from users where name = %s", (username))
     
-    #salt = uuid.uuid4().hex ## will need this to create accounts at some point
+    # salt = uuid.uuid4().hex ## will need this to create accounts at some point
+    # #print(salt)
+    # hashed_password = hashlib.sha512(password + salt).hexdigest()
+    # print("pass: ", hashed_password)
+    # print("salt:", salt)
 
-    data = cursor.fetchone()
-    if data is None:
-        return render_template('login.html', title='Login', error="Incorrect Username or Password")
-    else:
-        salt = data[1]
+    try:
+        cursor.execute("SELECT password, salt from users where name = %s", (username))
+        passwd, salt = cursor.fetchone()
         hashed_password = hashlib.sha512(password + salt).hexdigest()
-        if data[0] == hashed_password:
-            expire_date = datetime.datetime.now()
-            expire_date = expire_date + datetime.timedelta(days=30)
-            response = make_response(redirect("/api/"))
+        
+        if passwd == hashed_password:
+            response = make_response(redirect("/"))
             # TODO: Might add user auth tokens instead of storing the hashed password in the cookie
             # to furthe bolster security 
-            response.set_cookie('username', username, expires=expire_date)
-            response.set_cookie('password', hashed_password, expires=expire_date)
+            response.set_cookie('username', username)
+            response.set_cookie('password', hashed_password)
             return response
         else:
             return render_template('login.html', title='Login', error="Incorrect Username or Password")
             
-@app.route("/api/logout")
+    except:
+        return render_template('login.html', title='Login', error="Incorrect Username or Password")
+            
+            
+@app.route("/logout")
 def Logout():
     expire_date = datetime.datetime.now()
     expire_date = expire_date + datetime.timedelta(days=-30)
-    response = make_response(redirect("/api/"))
+    response = make_response(redirect("/"))
     # TODO: Might add user auth tokens instead of storing the hashed password in the cookie
     # to furthe bolster security 
     response.set_cookie('username', '', expires=expire_date)
