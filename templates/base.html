@@ -10,9 +10,9 @@
         <div id="container">
             <div class="title">
                 <h1>{{ title }} 
-                    {% if g.user != None %}
+                    {% if g.currentUser != None %}
                         <div id="logout">
-                            <a href="/api/logout">Logout</a>
+                            <a href="/logout">Logout</a>
                         </div>
                     {% endif %}
                 </h1>
