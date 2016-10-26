@@ -100,8 +100,24 @@ form input[type=submit], button {
     text-align: center;
 }
 
+input:invalid {
+    border: 1px solid #f00;
+}
+
+input:valid:focus {
+    border: 1px solid #00f;
+}
+
 button:disabled {
     background: #999999;
+}
+
+#createAccount {
+    float: left;
+}
+
+#createAccount > a {
+    color: blue;
 }
 
 #logout {

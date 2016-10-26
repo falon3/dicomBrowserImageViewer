@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/newUser.js') }}"></script>
 
 <form action="" method="POST">
     <table>
         <tr>
             <td><b>Username:</b></td>
-            <td valign="middle"><input type="text" name="username" /></td>
+            <td valign="middle"><input type="text" name="username" required /></td>
         </tr>
         <tr>
             <td><b>Password:</b></td>
-            <td valign="middle"><input type="password" name="password" /></td>
+            <td valign="middle"><input type="password" name="password" id="password" required />
+                <input type="password" placeholder="Confirm Password" id="confirm_password" required></td>
         </tr>
         <tr>
             <td><b>Email:</b></td>
-            <td valign="middle"><input type="email" name="email" /></td>
+            <td valign="middle"><input type="email" name="email" required /></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td valign="middle"><input type="submit" name="submit" value="Login" /></td>
+            <td valign="middle"><input type="submit" name="submit" id="submit" value="Create Account" /></td>
         </tr>
     </table>
 </form>
 
 {% endblock %}
+

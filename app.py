@@ -80,13 +80,14 @@ def upload():
     try:
         cursor.execute(                                                          
             "INSERT INTO image_sets (id, user_id, name)"                         
-            "VALUES (NULL, %s, %s)", g.currentUser.userID, setname                   
+            "VALUES (NULL, %s, %s)", (g.currentUser.userID, setname)  
         )
-    except:
+    except Exception as e:
+        print(e)
         # empty the temp files dir and return error message
-        for img in glob.glob(tempsaved+'*'):
+        for img in glob.glob(tempsaved):
             remove(img)
-            return "Duplicate image set name for this user, press back and try again"
+        return "Duplicate image set name for this user, press back and try again"
             
                                                                        
     # get current image_set id        
@@ -103,10 +104,10 @@ def upload():
             "INSERT INTO images (id, set_id, image)"
             "VALUES (NULL, %s, LOAD_FILE(%s))", (current_setid, picture) 
         )
-        remove(picture) # delete temp files
+        if set_size > 2:
+            remove(picture) # delete temp files
         
-    remove(tempsaved+setname) # delete temp directory
-
+    remove(tempsaved+setname) # delete original
     # return image id and number of images in set
     return redirect("/viewset/"+str(current_setid), code=302)
     
@@ -134,6 +135,7 @@ def get_image(img_id):
         cursor.execute("SELECT image FROM images WHERE id='%s'", img_id)        
         img = cursor.fetchone()[0]
         return send_file(BytesIO(img), mimetype='image/jpg')
+
     except:
         filename = 'images/error.gif'
         return send_file(filename)
@@ -180,16 +182,36 @@ def Authenticate():
         return render_template('login.html', title='Login', error="Incorrect Username or Password")
             
 
-@app.route("/newaccount", methods=['POST'])
+@app.route("/newaccount", methods=['GET', 'POST'])
 def newUser():
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
 
-    # to do check if valid and store in database
-    # validate cookies and set current
+    if(username is None or password is None or email is None):
+        return render_template('newaccount.html', title='New User Reqistration')
+    
+    try:
+        g.currentUser = User(username, password, email)
+        print("HERE!")
+        print(g.currentUser.name, g.currentUser.password)
+        # to do check if valid and store in database
+        # validate cookies and set current
+    except Exception as e:
+        print("USER not saved into db: " + str(e))
+        err = e[1]
+        err_entry = err.split()[2]
+        if "Duplicate" in err and "name" in err:
+            err = "Username " + err_entry + " already exists!"
 
-    return redirect("/")
+        if "Duplicate" in err and "email" in err:
+            err = "Email address " + err_entry + " is already used for another account!"
+        return render_template('newaccount.html', title='NewAccount', error=err)
+
+    response = make_response(redirect("/"))
+    response.set_cookie('username', username)
+    response.set_cookie('password', g.currentUser.password)
+    return response
             
 @app.route("/logout")
 def Logout():
