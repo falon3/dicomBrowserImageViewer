@@ -17,7 +17,6 @@ class User:
         '''creates userid and hashed, salted password and stores in database'''
 
         salt = uuid.uuid4().hex # password salt
-        print(type(salt))
         hashed_password = hashlib.sha512(self.password + salt).hexdigest()
         self.password = hashed_password
 
@@ -37,7 +36,6 @@ def getIDbyUsername(username):
     if userID is None:
         return None
     else:
-        print(userID)
         return userID[0]
         
 
