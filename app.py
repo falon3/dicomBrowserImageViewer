@@ -44,6 +44,7 @@ def logout_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         Logout()
+        return f(*args, **kwargs)
     return decorated_function
 
 @app.before_request
@@ -114,7 +115,6 @@ def upload():
         picture = tempsaved + setname + "-" + str(index) + ".jpg"
         picture = path.abspath(picture)
         contents = file_get_contents(picture)
-        #subprocess.call(['chmod', '777', picture])
 
         cursor.execute(
             "INSERT INTO images (id, set_id, image)"
@@ -124,7 +124,6 @@ def upload():
             remove(picture) # delete temp files
         
     remove(tempsaved+setname) # delete original
-    # return image id and number of images in set
     return redirect("/viewset/"+str(current_setid), code=302)
     
 # gets image set details from database to pass to template
@@ -214,6 +213,7 @@ def displayUserImageSets(username):
             
 
 @app.route("/newaccount/", methods=['GET', 'POST'])
+@logout_required
 def newUser():
     username = request.form.get('username')
     password = request.form.get('password')

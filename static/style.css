@@ -128,20 +128,6 @@ button:disabled {
     color: white;
 }
 
-#imageTable, tr, td, th{
-    border-collapse: collapse;
-    border: 0.5px solid black;
-    width: 100%;
-    vertical-align: center;
-    padding: 5px;
-    font-size: 15px;
-}
-#imageTable > tr{
-    height: 50px;
-    background-color: #4CAF50;
-    color: white;
-}
-
 div#viewer {
     width: 100%;
     text-align: center;
