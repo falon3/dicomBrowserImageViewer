@@ -18,18 +18,19 @@
                 </h1>
             </div>
             <div id="content">
-                {% if g.currentUser == None %}
-                <div id="createAccount">
-                    <a href="/newaccount">Create New Account</a>
-                </div>
-                <br>
-                {% endif %}
                 
                 {% if error != "" and error != null %}
                     <div class="error">{{ error }}</div>
                 {% endif %}
                 {% block content %}
                 {% endblock %}
+
+                {% if g.currentUser == None %}
+                    <div id="createAccount">
+                        <a href="/newaccount">Create a New Account</a>
+                    </div>
+                    <br>
+                {% endif %}
             </div>
         </div>
     </body>

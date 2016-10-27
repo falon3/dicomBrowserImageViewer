@@ -32,6 +32,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def logout_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        Logout()
+    return decorated_function
+
 @app.before_request
 def before_request():
     g.db = mysql.connect()
@@ -54,7 +60,8 @@ def after_request(response):
 @app.route('/')
 @login_required
 def index():
-    return render_template('upload.html', title='Upload DICOM')
+    #return render_template('upload.html', title="Dicom Uploader")
+    return redirect("/myimages/" + g.currentUser.name )
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])
@@ -71,7 +78,7 @@ def upload():
     convert = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
     if convert != 0:
-        return "Unable to convert image, press back and try a DICOM format"
+        return render_template('upload.html', error="Unable to convert image, needs a DICOM (.dcm) format")
     
     # get db connection cursor
     cursor = g.db.cursor()
@@ -83,11 +90,13 @@ def upload():
             "VALUES (NULL, %s, %s)", (g.currentUser.userID, setname)  
         )
     except Exception as e:
-        print(e)
+        err = e[1]
+        if "Duplicate" in err:
+            err = "Image set name already used for this user"
         # empty the temp files dir and return error message
-        for img in glob.glob(tempsaved):
+        for img in glob.glob(tempsaved+setname+'*'):
             remove(img)
-        return "Duplicate image set name for this user, press back and try again"
+        return render_template('upload.html', error=err)
             
                                                                        
     # get current image_set id        
@@ -118,12 +127,15 @@ def query_set(set_id):
 
     # get db connection cursor
     cursor = g.db.cursor()
-    cursor.execute("SELECT id FROM images WHERE set_id='%s'", set_id)
+    cursor.execute("SELECT id FROM images WHERE set_id='%s'", set_id)    
     img_list = cursor.fetchall()
     first = img_list[0][0]
     size = len(img_list)
+    cursor.execute("SELECT name FROM image_sets WHERE id='%s'", set_id)
+    set_name = cursor.fetchone()[0]
+    print(set_name)
     
-    return render_template('submit.html', title='DICOM Viewer', first = first, size = size)
+    return render_template('submit.html', title=set_name, first = first, size = size)
     
 @app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
@@ -140,7 +152,7 @@ def get_image(img_id):
         filename = 'images/error.gif'
         return send_file(filename)
 
-@app.route("/authenticate", methods=['GET', 'POST'])
+@app.route("/authenticate/", methods=['GET', 'POST'])
 def Authenticate():
     checkCurrentUser()
     
@@ -180,16 +192,30 @@ def Authenticate():
             
     except:
         return render_template('login.html', title='Login', error="Incorrect Username or Password")
+
+
+@app.route("/myimages/<username>/", methods=['GET'])
+@login_required
+def displayUserImageSets(username):
+    cursor = g.db.cursor()
+    cursor.execute("SELECT name from image_sets where user_id = %s", (g.currentUser.userID))
+    data = cursor.fetchall()
+    img_sets = [str(set[0]) for set in data]
+    print(img_sets)
+    
+    
+    return render_template('userpictures.html', title='User Image Set Library', result = img_sets)
+    
             
 
-@app.route("/newaccount", methods=['GET', 'POST'])
+@app.route("/newaccount/", methods=['GET', 'POST'])
 def newUser():
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
 
     if(username is None or password is None or email is None):
-        return render_template('newaccount.html', title='New User Reqistration')
+        return render_template('newaccount.html', title='New User Registration')
     
     try:
         g.currentUser = User(username, password, email)
@@ -213,7 +239,7 @@ def newUser():
     response.set_cookie('password', g.currentUser.password)
     return response
             
-@app.route("/logout")
+@app.route("/logout/")
 def Logout():
     expire_date = datetime.datetime.now()
     expire_date = expire_date + datetime.timedelta(days=-30)
@@ -222,6 +248,7 @@ def Logout():
     # to further bolster security 
     response.set_cookie('username', '', expires=expire_date)
     response.set_cookie('password', '', expires=expire_date)
+    g.currentUser = None
     return response
 
 if __name__ == '__main__':

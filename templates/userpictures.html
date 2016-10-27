@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- TODO add js scipt to make set names clickable -->
+
+<!--  <script type="text/javascript" src="{{ url_for('static', filename='scripts/newUser.js') }}"></script> -->
+<table border ="0" id="imageTable">
+    
+    <tr>
+        <th>Image set name</th>
+        <th># Images</th>
+    </tr>
+    {% for set in result %}
+    <tr >
+        <td > {{ set }} </td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
