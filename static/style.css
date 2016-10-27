@@ -108,6 +108,10 @@ input:valid:focus {
     border: 1px solid #00f;
 }
 
+input[type=button], input[type=submit], button {
+    border: none !important;
+}
+
 button:disabled {
     background: #999999;
 }
