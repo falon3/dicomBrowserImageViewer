@@ -181,7 +181,7 @@ def Authenticate():
     # hashed_password = hashlib.sha512(password + salt).hexdigest()
     # print("pass: ", hashed_password)
     # print("salt:", salt)
-
+    err = "Incorrect Username or Password"
     try:
         cursor.execute("SELECT password, salt from users where name = %s", (username))
         passwd, salt = cursor.fetchone()
@@ -193,23 +193,21 @@ def Authenticate():
             session['username'] = username
             return response
         else:
-            return render_template('login.html', title='Login', error="Incorrect Username or Password")
+            return render_template('login.html', title='Login', error= err)
             
     except:
-        return render_template('login.html', title='Login', error="Incorrect Username or Password")
+        return render_template('login.html', title='Login', error= err)
 
 
 @app.route("/myimages/<username>/", methods=['GET'])
 @login_required
 def displayUserImageSets(username):
     cursor = g.db.cursor()
-    cursor.execute("SELECT name from image_sets where user_id = %s", (g.currentUser.userID))
+    cursor.execute("SELECT name, id from image_sets where user_id = %s", (g.currentUser.userID))
     data = cursor.fetchall()
-    img_sets = [str(set[0]) for set in data]
-    print(img_sets)
-    
-    
-    return render_template('userpictures.html', title='User Image Set Library', result = img_sets)
+    img_dict = {str(set[0]): set[1] for set in data}
+
+    return render_template('userpictures.html', title='User Image Set Library', result = img_dict)
     
             
 
