@@ -2,16 +2,22 @@
 
 {% block content %}
 
-<table border ="0" id="imageTable">    
-    <tr>
-        <th>Image set name</th>
-    </tr>
-    {% for key, value in result.iteritems() %}
-    <tr >
-        <th> <a href="/viewset/{{ value }}">{{ key }}</a></th>
-    </tr>
-    {% endfor %}
+<table class="display" width="100%" cellspacing="0" id="imageTable">  
+    <thead>  
+        <tr>
+            <th>Image set name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, value in result.iteritems() %}
+        <tr>
+            <td> <a href="/viewset/{{ value }}">{{ key }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-
+<script type="text/javascript">
+    $("#imageTable").DataTable();
+</script>
 
 {% endblock %}
