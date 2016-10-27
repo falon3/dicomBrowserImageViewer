@@ -7,6 +7,7 @@ import hashlib, uuid
 import subprocess
 import fnmatch
 import settings
+import re
 from utils import *
 from User import *
 #import models
@@ -68,14 +69,19 @@ def after_request(response):
 @app.route('/')
 @login_required
 def index():
-    #return render_template('upload.html', title="Dicom Uploader")
     return redirect("/myimages/" + g.currentUser.name )
+
+@app.route('/upload/', methods=['GET'])
+@login_required
+def load_upload_page():
+    return render_template('upload.html', title= "Upload Dicom")
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])
 @login_required
 def upload():
     setname = request.form.get('filename')
+    setname = re.sub('[^A-Za-z0-9]+', '', setname)
     imagefile = request.files.get('imagefile', '')
         
     # save locally temp to convert from dicom to jpg format
@@ -124,12 +130,12 @@ def upload():
             remove(picture) # delete temp files
         
     remove(tempsaved+setname) # delete original
-    return redirect("/viewset/"+str(current_setid), code=302)
+    return redirect("/viewset/"+ str(current_setid) +':'+ setname, code=302)
     
 # gets image set details from database to pass to template
-@app.route('/viewset/<int:set_id>', methods=['GET'])
+@app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
-def query_set(set_id):
+def query_set(set_id, name):
 
     # get db connection cursor
     cursor = g.db.cursor()
@@ -206,7 +212,7 @@ def displayUserImageSets(username):
     data = cursor.fetchall()
     img_dict = {str(set[0]): set[1] for set in data}
 
-    return render_template('userpictures.html', title='User Image Set Library', result = img_dict)
+    return render_template('userpictures.html', title='User Dashboard', result = img_dict)
     
             
 

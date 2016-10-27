@@ -2,13 +2,14 @@
 
 {% block content %}
 
+<button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
 <table border ="0" id="imageTable">    
     <tr>
-        <th>Image set name</th>
+        <th>Image Sets</th>
     </tr>
     {% for key, value in result.iteritems() %}
     <tr >
-        <th> <a href="/viewset/{{ value }}">{{ key }}</a></th>
+        <th> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></th>
     </tr>
     {% endfor %}
 </table>
