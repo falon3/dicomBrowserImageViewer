@@ -29,6 +29,7 @@ mysql.init_app(app)
 SESSION_TYPE = 'filesystem'
 SESSION_FILE_DIR = '/tmp/'
 app.config.from_object(__name__)
+app.permanent_session_lifetime = datetime.timedelta(hours=1)
 Session(app)
 
 def login_required(f):
