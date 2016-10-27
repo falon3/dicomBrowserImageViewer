@@ -1,27 +1,35 @@
 #!flask/bin/python
-from flask import Flask, abort, send_file, render_template, request, url_for, redirect, make_response, g
+from flask import Flask, session, abort, send_file, render_template, request, url_for, redirect, make_response, g
 from flaskext.mysql import MySQL
+from flask_session import Session
 from functools import wraps
 import hashlib, uuid
 import subprocess
 import fnmatch
 import settings
+from utils import *
 from User import *
 #import models
 import glob
 import datetime
 from base64 import decodestring
-from os import listdir, makedirs, path, remove
+from os import listdir, makedirs, path, remove, urandom, getcwd
 from io import BytesIO
 import fnmatch
 
 mysql = MySQL()
 app = Flask(__name__)
+# DB Settings
 app.config['MYSQL_DATABASE_USER'] = settings.database['user']
 app.config['MYSQL_DATABASE_PASSWORD'] = settings.database['passwd']
 app.config['MYSQL_DATABASE_DB'] = settings.database['db']
 app.config['MYSQL_DATABASE_HOST'] = settings.database['host']
 mysql.init_app(app)
+# Session Settings
+SESSION_TYPE = 'filesystem'
+SESSION_FILE_DIR = '/tmp/'
+app.config.from_object(__name__)
+Session(app)
 
 def login_required(f):
     @wraps(f)
@@ -48,7 +56,6 @@ def after_request(response):
         g.db.commit()
         g.db.close()
         g.db = None
-    print(response)
     return response
 
 @app.route('/')
@@ -64,7 +71,7 @@ def upload():
     imagefile = request.files.get('imagefile', '')
         
     # save locally temp to convert from dicom to jpg format
-    tempsaved = 'temp/'
+    tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
     if not path.exists(tempsaved):
         makedirs(tempsaved)
     imagefile.save(tempsaved+setname)
@@ -75,12 +82,11 @@ def upload():
     
     # get db connection cursor
     cursor = g.db.cursor()
-         
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(                                                          
-            "INSERT INTO image_sets (id, user_id, name)"                         
-            "VALUES (NULL, %s, %s)", g.currentUser.userID, setname                   
+            "INSERT INTO image_sets (user_id, name)"                         
+            "VALUES (%s, %s)", (g.currentUser.userID, setname)             
         )
     except:
         # empty the temp files dir and return error message
@@ -97,11 +103,12 @@ def upload():
     for index in range(set_size):
         picture = tempsaved + setname + "-" + str(index) + ".jpg"
         picture = path.abspath(picture)
-        subprocess.call(['chmod', '777', picture])
+        contents = file_get_contents(picture)
+        #subprocess.call(['chmod', '777', picture])
 
         cursor.execute(
             "INSERT INTO images (id, set_id, image)"
-            "VALUES (NULL, %s, LOAD_FILE(%s))", (current_setid, picture) 
+            "VALUES (NULL, %s, %s)", (current_setid, contents) 
         )
         remove(picture) # delete temp files
         
@@ -168,10 +175,8 @@ def Authenticate():
                 
         if passwd == hashed_password:
             response = make_response(redirect("/"))
-            # TODO: Might add user auth tokens instead of storing the hashed password in the cookie
-            # to further bolster security 
-            response.set_cookie('username', username)
-            response.set_cookie('password', hashed_password)
+            session.clear()
+            session['username'] = username
             return response
         else:
             return render_template('login.html', title='Login', error="Incorrect Username or Password")
@@ -196,12 +201,9 @@ def Logout():
     expire_date = datetime.datetime.now()
     expire_date = expire_date + datetime.timedelta(days=-30)
     response = make_response(redirect("/"))
-    # TODO: Might add user auth tokens instead of storing the hashed password in the cookie
-    # to further bolster security 
-    response.set_cookie('username', '', expires=expire_date)
-    response.set_cookie('password', '', expires=expire_date)
+
+    session.clear()
     return response
 
 if __name__ == '__main__':
-    
     app.run(debug=True, port=8080)

@@ -9,6 +9,7 @@ inside of project directory run the following commands
 $ virtualenv flask
 $ flask/bin/pip install flask
 $ pip install flask-mysql
+$ pip install Flask-Session
 
 ```
     
