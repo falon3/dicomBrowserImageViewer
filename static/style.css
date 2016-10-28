@@ -61,25 +61,26 @@ p.footer{
 }
 
 /* Form Styles */
-form label{
+label{
     display: block;
-    margin-bottom: 5px;
 }
-form input {
+
+input {
     border: 1px solid #aaa;
     border-radius: 2px;
     box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
     box-sizing: border-box;
     padding: 5px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     outline: 0;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
     -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
 }
-form input[type=submit], button {
+
+input[type=submit], button {
     background: #198ad1;
     color: #fff;
     display: inline-block;
@@ -106,6 +107,10 @@ input:invalid {
 
 input:valid:focus {
     border: 1px solid #00f;
+}
+
+input[type=button], input[type=submit], button {
+    border: none !important;
 }
 
 button:disabled {
@@ -205,4 +210,8 @@ canvas#canvas {
 .error a, .error a:visited, .inlineError a, .inlineError a:visited {
     color: #D50013 !important;
     font-weight: bold;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none;
 }

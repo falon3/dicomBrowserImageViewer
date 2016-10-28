@@ -30,6 +30,7 @@ mysql.init_app(app)
 SESSION_TYPE = 'filesystem'
 SESSION_FILE_DIR = '/tmp/'
 app.config.from_object(__name__)
+app.permanent_session_lifetime = datetime.timedelta(hours=1)
 Session(app)
 
 def login_required(f):
@@ -69,7 +70,11 @@ def after_request(response):
 @app.route('/')
 @login_required
 def index():
-    return redirect("/myimages/" + g.currentUser.name )
+    cursor = g.db.cursor()
+    cursor.execute("SELECT name, id from image_sets where user_id = %s", (g.currentUser.userID))
+    data = cursor.fetchall()
+    img_dict = {str(set[0]): set[1] for set in data}
+    return render_template('userpictures.html', title='User Image Set Library', result = img_dict)    
 
 @app.route('/upload/', methods=['GET'])
 @login_required
@@ -139,14 +144,20 @@ def query_set(set_id, name):
 
     # get db connection cursor
     cursor = g.db.cursor()
-    cursor.execute("SELECT id FROM images WHERE set_id='%s'", set_id)    
+    cursor.execute("SELECT i.id "
+                   "FROM images i, image_sets s "
+                   "WHERE i.set_id=%s "
+                   "AND i.set_id = s.id "
+                   "AND s.user_id=%s", (set_id, g.currentUser.userID))    
     img_list = cursor.fetchall()
     first = img_list[0][0]
     size = len(img_list)
-    cursor.execute("SELECT name FROM image_sets WHERE id='%s'", set_id)
+    cursor.execute("SELECT name "
+                   "FROM image_sets "
+                   "WHERE id=%s "
+                   "AND user_id=%s", (set_id, g.currentUser.userID))
     set_name = cursor.fetchone()[0]
-    print(set_name)
-    
+
     return render_template('submit.html', title=set_name, first = first, size = size)
     
 @app.route('/upload/<int:img_id>', methods=['GET'])
@@ -156,7 +167,11 @@ def get_image(img_id):
     cursor = g.db.cursor()   
     try:
         #get image set from database
-        cursor.execute("SELECT image FROM images WHERE id='%s'", img_id)        
+        cursor.execute("SELECT i.image "
+                       "FROM images i, image_sets s "
+                       "WHERE i.id=%s "
+                       "AND i.set_id = s.id "
+                       "AND s.user_id=%s", (img_id, g.currentUser.userID))        
         img = cursor.fetchone()[0]
         return send_file(BytesIO(img), mimetype='image/jpg')
 
@@ -203,19 +218,6 @@ def Authenticate():
     except:
         return render_template('login.html', title='Login', error= err)
 
-
-@app.route("/myimages/<username>/", methods=['GET'])
-@login_required
-def displayUserImageSets(username):
-    cursor = g.db.cursor()
-    cursor.execute("SELECT name, id from image_sets where user_id = %s", (g.currentUser.userID))
-    data = cursor.fetchall()
-    img_dict = {str(set[0]): set[1] for set in data}
-
-    return render_template('userpictures.html', title='User Dashboard', result = img_dict)
-    
-            
-
 @app.route("/newaccount/", methods=['GET', 'POST'])
 @logout_required
 def newUser():
@@ -228,7 +230,6 @@ def newUser():
     
     try:
         g.currentUser = User(username, password, email)
-        print("HERE!")
         print(g.currentUser.name, g.currentUser.password)
         # to do check if valid and store in database
         # validate cookies and set current

@@ -2,17 +2,24 @@
 
 {% block content %}
 
-<button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
-<table border ="0" id="imageTable">    
-    <tr>
-        <th>Image Sets</th>
-    </tr>
-    {% for key, value in result.iteritems() %}
-    <tr >
-        <th> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></th>
-    </tr>
-    {% endfor %}
-</table>
 
+<button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
+<table class="display" width="100%" cellspacing="0" id="imageTable">  
+    <thead>  
+        <tr>
+            <th>Image set name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, value in result.iteritems() %}
+        <tr>
+            <th> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></th>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script type="text/javascript">
+    $("#imageTable").DataTable();
+</script>
 
 {% endblock %}
