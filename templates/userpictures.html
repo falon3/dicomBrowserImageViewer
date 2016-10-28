@@ -8,15 +8,15 @@
 <table class="display" width="100%" cellspacing="0" id="imageTable">  
     <thead>  
         <tr>
-            <th>Image set name</th>
-            <th>Date uploaded</th>
+            <th>Image Set Name</th>
+            <th>Date Uploaded</th>
         </tr>
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr>
-            <td> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></td>
-            <td>  </td>
+            <td> <a href="/viewset/{{ value['id'] }}:{{ key }}">{{ key }}</a></td>
+            <td> {{ value['timestamp'] }}</td>
         </tr>
         {% endfor %}
     </tbody>
