@@ -74,7 +74,7 @@ def index():
     cursor.execute("SELECT name, id from image_sets where user_id = %s", (g.currentUser.userID))
     data = cursor.fetchall()
     img_dict = {str(set[0]): set[1] for set in data}
-    return render_template('userpictures.html', title='User Image Set Library', result = img_dict)    
+    return render_template('userpictures.html', title='my images', result = img_dict)    
 
 @app.route('/upload/', methods=['GET'])
 @login_required
@@ -230,7 +230,6 @@ def newUser():
     
     try:
         g.currentUser = User(username, password, email)
-        print(g.currentUser.name, g.currentUser.password)
         # to do check if valid and store in database
         # validate cookies and set current
     except Exception as e:
@@ -244,10 +243,9 @@ def newUser():
             err = "Email address " + err_entry + " is already used for another account!"
         return render_template('newaccount.html', title='NewAccount', error=err)
 
-    response = make_response(redirect("/"))
-    response.set_cookie('username', username)
-    response.set_cookie('password', g.currentUser.password)
-    return response
+    session.clear()
+    session['username'] = username
+    return redirect("/")
             
 @app.route("/logout/")
 def Logout():

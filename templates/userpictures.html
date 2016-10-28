@@ -4,16 +4,19 @@
 
 
 <button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
+<br><br>
 <table class="display" width="100%" cellspacing="0" id="imageTable">  
     <thead>  
         <tr>
             <th>Image set name</th>
+            <th>Date uploaded</th>
         </tr>
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr>
-            <th> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></th>
+            <td> <a href="/viewset/{{ value }}:{{ key }}">{{ key }}</a></td>
+            <td>  </td>
         </tr>
         {% endfor %}
     </tbody>
