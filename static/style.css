@@ -23,6 +23,11 @@ a {
     height: 50px;
 }
 
+.img-circle {
+    border-radius: 50%;
+    vertical-align: middle;    
+}
+
 h1 {
     color: #fff;
     margin: 0;
@@ -131,6 +136,10 @@ button:disabled {
 
 #logout > a {
     color: white;
+}
+
+#currentuser {   
+    padding-right: 50px;
 }
 
 div#viewer {
