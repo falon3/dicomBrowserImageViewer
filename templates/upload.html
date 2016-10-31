@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/upload.js') }}"></script>
+
 <form enctype="multipart/form-data" method="post" action="{{ url_for('upload') }}">
         <label for="filename"> Please enter a name for the set of images: </label>
-        <input type="text" name= "filename" id="filename" /><br/>
-        <input type="file" name= "imagefile" id="imagefile" >
-        <input type="submit" value="Upload" />
+        <input type="text" name= "filename" id="filename" required /><br/>
+        <input type="file" name= "imagefile" id="imagefile" required>
+        <input type="submit" value="Upload" id="upsubmit"/>
     </form>
 {% endblock %}
