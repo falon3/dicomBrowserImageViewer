@@ -96,9 +96,9 @@ def upload():
     imagefile.save(tempsaved+setname)
     
     try:
-        output = subprocess.check_output(['identify', '-verbose', str(tempsaved+setname)])
-        matched_lines = [line for line in output.split('\n') if "dcm:PixelSpacing" in line]
-        rows, cols = matched_lines[0].replace('    dcm:PixelSpacing: ', '').split('\\')
+        output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing]', str(tempsaved+setname)])
+        matched_lines = [line for line in output.split(' ')]
+        rows, cols = matched_lines[0].split('\\')
         
         rows = float(rows)
         cols = float(cols)
