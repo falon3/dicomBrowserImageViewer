@@ -94,6 +94,11 @@ def upload():
     if not path.exists(tempsaved):
         makedirs(tempsaved)
     imagefile.save(tempsaved+setname)
+    
+    output = subprocess.check_output(['identify', '-verbose', str(tempsaved+setname)])
+    matched_lines = [line for line in output.split('\n') if "dcm:PixelSpacing" in line]
+    print matched_lines[0]
+    
     convert = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
     if convert != 0:
