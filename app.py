@@ -95,11 +95,28 @@ def upload():
         makedirs(tempsaved)
     imagefile.save(tempsaved+setname)
     
-    output = subprocess.check_output(['identify', '-verbose', str(tempsaved+setname)])
-    matched_lines = [line for line in output.split('\n') if "dcm:PixelSpacing" in line]
-    print matched_lines[0]
+    try:
+        output = subprocess.check_output(['identify', '-verbose', str(tempsaved+setname)])
+        matched_lines = [line for line in output.split('\n') if "dcm:PixelSpacing" in line]
+        rows, cols = matched_lines[0].replace('    dcm:PixelSpacing: ', '').split('\\')
+        
+        rows = float(rows)
+        cols = float(cols)
+        
+        resize = ""
+        if(rows == cols):
+            # no resize needed
+            resize = "100%x100%"
+        elif (cols > rows):
+            factor = (cols/rows)*100
+            resize = str(factor) + "%x100%"
+        elif (rows > cols):
+            factor = (rows/cols)*100
+            resize = "100%x" + str(factor) + "%"
+    except:
+        return render_template('upload.html', error="Unable to get image pixel spacing")
     
-    convert = subprocess.call(['mogrify', '-format', 'jpg', tempsaved+setname])
+    convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
     if convert != 0:
         return render_template('upload.html', error="Unable to convert image, needs a DICOM (.dcm) format")
