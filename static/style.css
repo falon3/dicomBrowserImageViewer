@@ -65,6 +65,7 @@ p.footer{
     margin: 10px;
     border: 1px solid #292929;
     -webkit-box-shadow: 0 0 8px #292929;
+    box-shadow: 0 0 8px #292929;
 }
 
 /* Form Styles */
@@ -160,6 +161,14 @@ div#viewerContainer {
     border-radius: 2px;
 }
 
+div#viewerContainer.fullscreen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
 div#topViewer {
     min-width: 500px;
     text-align: left;
@@ -185,6 +194,32 @@ div#bottomViewer {
     border-top: 1px solid #191919;
 }
 
+.fullscreen div#topViewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.fullscreen div#middleViewer {
+    position: fixed;
+    top: 60px;
+    left: 15px;
+    right: 15px;
+    bottom: 90px;
+}
+
+.fullscreen div#bottomViewer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+div#fullscreen {
+    float: right;
+}
+
 canvas#canvas {
     position: absolute;
     top: 0;
@@ -192,8 +227,13 @@ canvas#canvas {
     cursor: none;
 }
 
-img#slice {
-    border: 1px solid #191919;
+.fullscreen canvas#canvas {
+    left: auto;
+    right: auto;
+}
+
+.fullscreen img#slice {
+    height: 100%;
 }
 
 #previous {

@@ -14,6 +14,11 @@ $(document).ready(function(){
     var closePointId = -1;
     var dragging = false;
     var segments = 16;
+    
+    var naturalWidth = 1;
+    var naturalHeight = 1;
+    
+    var scalingFactor = 1;
 
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
@@ -33,8 +38,14 @@ $(document).ready(function(){
         $("#maxImage").text(images.length);
         
         // Canvas
+        naturalWidth = $("#slice")[0].naturalWidth;
+        naturalHeight = $("#slice")[0].naturalHeight;
+        
+        scalingFactor = naturalWidth/$("#slice").width();
+        
         canvas.width = $("#slice").width();
         canvas.height = $("#slice").height();
+        
         if(canvas.width == 0){
             // Image wasn't done loading yet, try again later...
             _.defer(render);
@@ -46,31 +57,31 @@ $(document).ready(function(){
             closePointId = -1;
         }
         _.each(points[currentImage], function(point, i){
-            curvePoints.push(point.x);
-            curvePoints.push(point.y);
+            curvePoints.push(point.x/scalingFactor);
+            curvePoints.push(point.y/scalingFactor);
             // While we are here, check distance to points
-            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*2){
+            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*2/scalingFactor){
                 closePointId = i;
             }
         });
         
         context.drawCurve(curvePoints, 0.5, false, segments);
         context.strokeStyle = 'red';
-        context.lineWidth = 2;
+        context.lineWidth = 2/scalingFactor;
         context.stroke();
         _.each(points[currentImage], function(point, i){
-            var radius = RADIUS;
+            var radius = RADIUS/scalingFactor;
             if(i == closePointId){
                 radius *= 2;
             }
             context.beginPath();
-            context.arc(point.x, point.y, radius, 0, 2 * Math.PI, false);
+            context.arc(point.x/scalingFactor, point.y/scalingFactor, radius, 0, 2 * Math.PI, false);
             context.fillStyle = 'red';
             context.fill();
         });
         
         context.beginPath();
-        context.arc(mousePoint.x, mousePoint.y, RADIUS, 0, 2 * Math.PI, false);
+        context.arc(mousePoint.x/scalingFactor, mousePoint.y/scalingFactor, RADIUS/scalingFactor, 0, 2 * Math.PI, false);
         context.fillStyle = 'red';
         context.fill();
         
@@ -88,6 +99,8 @@ $(document).ready(function(){
             $("#next").prop('disabled', false);
         }
     }
+    
+    $(window).resize(render);
     
     // Clicking the Previous button
     $("#previous").click(function(){
@@ -126,9 +139,16 @@ $(document).ready(function(){
         render();
     });
     
+    $("#fullscreen a").click(function(e){
+        $("#viewerContainer").toggleClass("fullscreen");
+        render();
+    });
+    
     // Mouse moving
     canvas.addEventListener('mousemove', function(e){
         coords = canvas.relMouseCoords(e);
+        coords.x *= scalingFactor;
+        coords.y *= scalingFactor;
         mousePoint = coords;
         if(dragging){
             points[currentImage][closePointId] = mousePoint;
@@ -139,6 +159,8 @@ $(document).ready(function(){
     // Clicking to add a point
     canvas.addEventListener('mousedown', function(e){
         coords = canvas.relMouseCoords(e);
+        coords.x *= scalingFactor;
+        coords.y *= scalingFactor;
         dragging = true;
         if(closePointId != -1){
             
