@@ -118,7 +118,7 @@ def upload():
             factor = (rows/cols)*100
             resize = "100%x" + str(factor) + "%"
     except:
-        return render_template('upload.html', error="Unable to get image pixel spacing")
+        resize = "100%x100%"
     
     convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
@@ -149,7 +149,10 @@ def upload():
     
     # save all in set as blobs in images table in database in correct order
     for index in range(set_size):
-        picture = tempsaved + setname + "-" + str(index) + ".jpg"
+        if(set_size > 1):
+            picture = tempsaved + setname + "-" + str(index) + ".jpg"
+        else:
+            picture = tempsaved + setname + ".jpg"
         picture = path.abspath(picture)
         contents = file_get_contents(picture)
 
