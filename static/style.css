@@ -224,3 +224,7 @@ canvas#canvas {
 table.dataTable.no-footer {
     border-bottom: none;
 }
+
+table.dataTable th.sorting {
+    cursor: pointer;
+}
