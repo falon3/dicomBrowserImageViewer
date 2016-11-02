@@ -11,7 +11,9 @@ $(document).ready(function(){
     var points = new Array();
     var mousePoint = {x: 0, y: 0};
     var currentImage = 0;
+    var currentLine = new Array();
     var closePointId = -1;
+    var closeLineId = -1;
     var dragging = false;
     var segments = 18;
     
@@ -27,6 +29,12 @@ $(document).ready(function(){
     _.each(images, function(img, i){
         points[i] = new Array();
     });
+    
+    var deleteSelectedPoint = function(){
+        points[currentImage][closeLineId].splice(closePointId, 1);
+        closePointId = -1;
+        render();
+    };
     
     // The main render function for the viewer.  
     // It is called everytime that a change has been made
@@ -52,32 +60,42 @@ $(document).ready(function(){
             return;
         }
         
-        var curvePoints = new Array();
         if(!dragging){
             closePointId = -1;
+            closeLineId = -1;
         }
-        _.each(points[currentImage], function(point, i){
-            curvePoints.push(point.x/scalingFactor);
-            curvePoints.push(point.y/scalingFactor);
-            // While we are here, check distance to points
-            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*1.75){
-                closePointId = i;
-            }
-        });
         
-        context.drawCurve(curvePoints, 0.5, false, segments);
-        context.strokeStyle = 'red';
-        context.lineWidth = 2/scalingFactor;
-        context.stroke();
-        _.each(points[currentImage], function(point, i){
-            var radius = RADIUS/scalingFactor;
-            if(i == closePointId){
-                radius *= 1.75;
+        _.each(points[currentImage], function(line, i){
+            var curvePoints = new Array();
+            _.each(line, function(point, j){
+                curvePoints.push(point.x/scalingFactor);
+                curvePoints.push(point.y/scalingFactor);
+                // While we are here, check distance to points
+                if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*1.75){
+                    closePointId = j;
+                    closeLineId = i;
+                }
+            });
+            
+            context.drawCurve(curvePoints, 0.5, false, segments);
+            context.strokeStyle = 'red';
+            if(i == currentLine[currentImage]){
+                context.lineWidth = 2/scalingFactor;
             }
-            context.beginPath();
-            context.arc(point.x/scalingFactor, point.y/scalingFactor, radius, 0, 2 * Math.PI, false);
-            context.fillStyle = 'red';
-            context.fill();
+            else{
+                context.lineWidth = 1/scalingFactor;
+            }
+            context.stroke();
+            _.each(line, function(point, j){
+                var radius = RADIUS/scalingFactor;
+                if(j == closePointId && i == closeLineId){
+                    radius *= 1.75;
+                }
+                context.beginPath();
+                context.arc(point.x/scalingFactor, point.y/scalingFactor, radius, 0, 2 * Math.PI, false);
+                context.fillStyle = 'red';
+                context.fill();
+            });
         });
         
         context.beginPath();
@@ -98,7 +116,9 @@ $(document).ready(function(){
         else{
             $("#next").prop('disabled', false);
         }
-    }
+    };
+    
+    /* Event Listeners */
     
     $(window).resize(render);
     
@@ -129,9 +149,10 @@ $(document).ready(function(){
         e.preventDefault();
     });
     
+    // Clicking the curved button
     $("#curved").change(function(e){
         if($("#curved").is(":checked")){
-            segments = 16;
+            segments = 18;
         }
         else{
             segments = 1;
@@ -139,6 +160,7 @@ $(document).ready(function(){
         render();
     });
     
+    // Clicking the full screen button
     $("#fullscreen a").click(function(e){
         $("#viewerContainer").toggleClass("fullscreen");
         if($("#viewerContainer").hasClass("fullscreen")){
@@ -154,6 +176,18 @@ $(document).ready(function(){
         render();
     });
     
+    // Pressing the delete key
+    $(window).keyup(function(e){
+        if(e.keyCode == 46){ // Delete
+            deleteSelectedPoint();
+        }
+    });
+    
+    // Disable the context menu
+    canvas.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+    });
+    
     // Mouse moving
     canvas.addEventListener('mousemove', function(e){
         coords = canvas.relMouseCoords(e);
@@ -161,7 +195,10 @@ $(document).ready(function(){
         coords.y *= scalingFactor;
         mousePoint = coords;
         if(dragging){
-            points[currentImage][closePointId] = mousePoint;
+            if(closeLineId == -1){
+                closeLineId = currentLine[currentImage];
+            }
+            points[currentImage][closeLineId][closePointId] = mousePoint;
         }
         render();
     });
@@ -171,13 +208,34 @@ $(document).ready(function(){
         coords = canvas.relMouseCoords(e);
         coords.x *= scalingFactor;
         coords.y *= scalingFactor;
-        dragging = true;
-        if(closePointId == -1){
-            // Adding new point
-            points[currentImage].push(coords);
-            closePointId = points[currentImage].length - 1;
+        if(e.button == 2){
+            // Right Click
+            if(closePointId != -1){
+                deleteSelectedPoint();
+                return;
+            }
+            else {
+                currentLine[currentImage] = points[currentImage].length;
+            }
         }
-        
+        if(e.button == 0 || e.button == 2){
+            // Left Click (or Right Click)
+            dragging = true;
+            if(closePointId == -1){
+                // Adding new point
+                if(currentLine[currentImage] == undefined){
+                    currentLine[currentImage] = 0;
+                }
+                if(points[currentImage][currentLine[currentImage]] == undefined){
+                    points[currentImage][currentLine[currentImage]] = new Array();
+                }
+                points[currentImage][currentLine[currentImage]].push(coords);
+                closePointId = points[currentImage][currentLine[currentImage]].length - 1;
+            }
+            else{
+                currentLine[currentImage] = closeLineId;
+            }
+        }
         render();
     });
     
