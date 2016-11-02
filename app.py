@@ -120,10 +120,8 @@ def upload():
         elif (rows > cols):
             factor = (rows/cols)*100
             resize = "100%x" + str(factor) + "%"
-    except Exception as e:
+    except:
         resize = "100%x100%"
-        print(e)
-    print(resize)
     
     convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
