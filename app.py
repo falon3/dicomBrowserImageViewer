@@ -101,12 +101,8 @@ def upload():
     
     try:
         output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname)])
-        print(output)
         matched_lines = [line for line in output.split(',')]
-        print("one")
-        print(matched_lines[0])
-        rows, cols = matched_lines[0].split('\\')
-        print("here")
+        rows, cols = matched_lines[0].strip().split('\\')
         rows = float(rows)
         cols = float(cols)
         
