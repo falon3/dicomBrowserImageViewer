@@ -100,10 +100,13 @@ def upload():
     imagefile.save(tempsaved+setname)
     
     try:
-        output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing]', str(tempsaved+setname)])
-        matched_lines = [line for line in output.split(' ')]
+        output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname)])
+        print(output)
+        matched_lines = [line for line in output.split(',')]
+        print("one")
+        print(matched_lines[0])
         rows, cols = matched_lines[0].split('\\')
-        
+        print("here")
         rows = float(rows)
         cols = float(cols)
         
@@ -117,8 +120,10 @@ def upload():
         elif (rows > cols):
             factor = (rows/cols)*100
             resize = "100%x" + str(factor) + "%"
-    except:
+    except Exception as e:
         resize = "100%x100%"
+        print(e)
+    print(resize)
     
     convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
