@@ -1,4 +1,4 @@
-RADIUS = 3;
+RADIUS = 2.5;
 
 $(document).ready(function(){
 
@@ -13,7 +13,7 @@ $(document).ready(function(){
     var currentImage = 0;
     var closePointId = -1;
     var dragging = false;
-    var segments = 16;
+    var segments = 18;
     
     var naturalWidth = 1;
     var naturalHeight = 1;
@@ -60,7 +60,7 @@ $(document).ready(function(){
             curvePoints.push(point.x/scalingFactor);
             curvePoints.push(point.y/scalingFactor);
             // While we are here, check distance to points
-            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*2/scalingFactor){
+            if(!dragging && euclideanDistance(point, mousePoint) <= RADIUS*1.75){
                 closePointId = i;
             }
         });
@@ -72,7 +72,7 @@ $(document).ready(function(){
         _.each(points[currentImage], function(point, i){
             var radius = RADIUS/scalingFactor;
             if(i == closePointId){
-                radius *= 2;
+                radius *= 1.75;
             }
             context.beginPath();
             context.arc(point.x/scalingFactor, point.y/scalingFactor, radius, 0, 2 * Math.PI, false);
@@ -172,10 +172,7 @@ $(document).ready(function(){
         coords.x *= scalingFactor;
         coords.y *= scalingFactor;
         dragging = true;
-        if(closePointId != -1){
-            
-        }
-        else{
+        if(closePointId == -1){
             // Adding new point
             points[currentImage].push(coords);
             closePointId = points[currentImage].length - 1;
