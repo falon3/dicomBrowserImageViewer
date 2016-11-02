@@ -15,6 +15,7 @@ a {
     color: #FFFFFF;
     background-color: transparent;
     font-weight: normal;
+    outline: 0;
 }
 
 .title {

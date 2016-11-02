@@ -141,6 +141,16 @@ $(document).ready(function(){
     
     $("#fullscreen a").click(function(e){
         $("#viewerContainer").toggleClass("fullscreen");
+        if($("#viewerContainer").hasClass("fullscreen")){
+            $("#fullscreen img").attr("src", "/static/exitFullScreen.png");
+            $("#fullscreen img").attr("alt", "Exit Full Screen");
+            $("#fullscreen img").attr("title", "Exit Full Screen");
+        }
+        else{
+            $("#fullscreen img").attr("src", "/static/fullScreen.png");
+            $("#fullscreen img").attr("alt", "Full Screen");
+            $("#fullscreen img").attr("title", "Full Screen");
+        }
         render();
     });
     
