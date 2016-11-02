@@ -228,8 +228,11 @@ canvas#canvas {
 }
 
 .fullscreen canvas#canvas {
-    left: auto;
-    right: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 
 .fullscreen img#slice {
