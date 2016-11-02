@@ -101,12 +101,8 @@ def upload():
     
     try:
         output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname)])
-        print(output)
         matched_lines = [line for line in output.split(',')]
-        print("one")
-        print(matched_lines[0])
-        rows, cols = matched_lines[0].split('\\')
-        print("here")
+        rows, cols = matched_lines[0].strip().split('\\')
         rows = float(rows)
         cols = float(cols)
         
@@ -122,8 +118,6 @@ def upload():
             resize = "100%x" + str(factor) + "%"
     except Exception as e:
         resize = "100%x100%"
-        print(e)
-    print(resize)
     
     convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
