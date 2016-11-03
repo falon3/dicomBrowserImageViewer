@@ -4,6 +4,12 @@
 
 <form enctype="multipart/form-data" method="post" action="{{ url_for('upload') }}">
         <label for="filename"> Please enter a name for the set of images: </label>
+        <select name="study"  id="study"> Select study
+            <option selected="selected" disabled="disabled">Select a Study</option>
+            {% for i in range(num_studies) %}
+            <option value="{{ studies[i] }}">{{ studies[i] }}</option>
+            {% endfor %}
+        </select>
         <input type="text" name= "filename" id="filename" required /><br/>
         <input type="file" name= "imagefile" id="imagefile" required>
         <input type="submit" value="Upload" id="upsubmit"/>

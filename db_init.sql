@@ -55,10 +55,11 @@ CREATE TABLE `image_sets` (
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `study` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni` (`user_id`,`name`),
   CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,7 +133,7 @@ CREATE TABLE `points` (
   `line_id` int(11) NOT NULL,
   `x` float NOT NULL,
   `y` float NOT NULL,
-  `interpolated` int(1) NOT NULL DEFAULT '0',
+  `interpolated` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `line_id` (`line_id`),
   CONSTRAINT `points_ibfk_1` FOREIGN KEY (`line_id`) REFERENCES `lines` (`id`)

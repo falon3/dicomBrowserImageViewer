@@ -83,7 +83,10 @@ def index():
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page():
-    return render_template('upload.html', title= "Upload Dicom")
+    with open('StudyList.txt') as f:
+        studies = f.read().splitlines()
+    f.close()
+    return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])
@@ -92,7 +95,10 @@ def upload():
     setname = request.form.get('filename')
     setname = re.sub('[^A-Za-z0-9]+', '', setname)
     imagefile = request.files.get('imagefile', '')
-        
+    study = request.form.get('study')
+    
+    #TODO: save study if not null into image_sets study column
+  
     # save locally temp to convert from dicom to jpg format
     tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
     if not path.exists(tempsaved):
