@@ -2,6 +2,8 @@
 
 	create database dcmviewer;
 	use dcmviewer;
+
+then from there copy past this dump into your command line
 */
 
 -- MySQL dump 10.13  Distrib 5.5.52, for debian-linux-gnu (x86_64)
@@ -22,43 +24,8 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `image_sets`
---
-
-DROP TABLE IF EXISTS `image_sets`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `image_sets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL DEFAULT '',
-  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uni` (`user_id`,`name`),
-  CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `images`
---
-
-DROP TABLE IF EXISTS `images`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `images` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `set_id` int(11) NOT NULL,
-  `image` longblob,
-  PRIMARY KEY (`id`),
-  KEY `set_id` (`set_id`),
-  CONSTRAINT `images_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5125 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `users`
---
+-- FIRST
 
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -76,6 +43,104 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+--
+-- Table structure for table `image_sets`
+-- SECOND
+
+DROP TABLE IF EXISTS `image_sets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `image_sets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uni` (`user_id`,`name`),
+  CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `images`
+-- THREE
+
+DROP TABLE IF EXISTS `images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `set_id` int(11) NOT NULL,
+  `image` longblob,
+  PRIMARY KEY (`id`),
+  KEY `set_id` (`set_id`),
+  CONSTRAINT `images_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `sessions`
+-- FOURTH
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sessions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `set_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `study` varchar(50) NOT NULL DEFAULT '',
+  `color` varchar(6) NOT NULL DEFAULT 'FF0000',
+  PRIMARY KEY (`id`),
+  KEY `set_id` (`set_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`),
+  CONSTRAINT `sessions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `lines`
+-- FIVE
+
+DROP TABLE IF EXISTS `lines`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `image_id` int(11) NOT NULL,
+  `session_id` int(11) NOT NULL,
+  `color` varchar(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `image_id` (`image_id`),
+  KEY `session_id` (`session_id`),
+  CONSTRAINT `lines_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`),
+  CONSTRAINT `lines_ibfk_2` FOREIGN KEY (`session_id`) REFERENCES `sessions` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `points`
+-- SIXTH
+
+DROP TABLE IF EXISTS `points`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `points` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `line_id` int(11) NOT NULL,
+  `x` float NOT NULL,
+  `y` float NOT NULL,
+  `interpolated` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `line_id` (`line_id`),
+  CONSTRAINT `points_ibfk_1` FOREIGN KEY (`line_id`) REFERENCES `lines` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -84,4 +149,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-02 12:22:28
+-- Dump completed on 2016-11-03 13:24:30
