@@ -194,7 +194,6 @@ Viewer = Backbone.View.extend({
     },
 
     render: function(){
-        console.log("RENDER");
         if(this.slice[0] == undefined){
             // Something went wrong, try to re-get the slice
             this.slice = this.$("#slice");
