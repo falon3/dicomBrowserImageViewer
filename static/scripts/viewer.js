@@ -104,11 +104,18 @@ Viewer = Backbone.View.extend({
         this.render();
     },
     
-    // Moving the mouse coordinates
-    mouseMove: function(e){
+    relMouseCoords: function(e){
         coords = this.canvas.relMouseCoords(e);
         coords.x *= this.scalingFactor;
         coords.y *= this.scalingFactor;
+        coords.x = Math.min(Math.max(coords.x, this.RADIUS), this.naturalWidth-this.RADIUS);
+        coords.y = Math.min(Math.max(coords.y, this.RADIUS), this.naturalHeight-this.RADIUS);
+        return coords;
+    },
+    
+    // Moving the mouse coordinates
+    mouseMove: function(e){
+        var coords = this.relMouseCoords(e);
         this.mousePoint = coords;
         if(this.dragging){
             if(this.closeLine == null){
@@ -121,9 +128,7 @@ Viewer = Backbone.View.extend({
     
     // Clicking the mouse button (both left/right)
     mouseDown: function(e){
-        coords = this.canvas.relMouseCoords(e);
-        coords.x *= this.scalingFactor;
-        coords.y *= this.scalingFactor;
+        var coords = this.relMouseCoords(e);
         if(e.button == 2){
             // Right Click
             if(this.closePoint != null){
@@ -163,6 +168,7 @@ Viewer = Backbone.View.extend({
     // Releasing the mouse button
     mouseUp: function(e){
         this.dragging = false;
+        this.mousePoint = {x: -1000, y: -1000};
         this.render();
     },
     
