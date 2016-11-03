@@ -36,6 +36,7 @@ Viewer = Backbone.View.extend({
         this.$("#canvas").bind('mousewheel DOMMouseScroll', $.proxy(this.scroll, this));
         $(window).bind('keyup', $.proxy(function(e){ if(e.keyCode == 46){ this.deletePoint(); }}, this)),
         $(window).resize($.proxy(this.render, this));
+        $(window).mouseup($.proxy(this.mouseUp, this));
     },
     
     // Deletes the selected point
@@ -153,8 +154,9 @@ Viewer = Backbone.View.extend({
     
     // Leaving the canvas area
     mouseLeave: function(e){
-        this.dragging = false;
-        this.mousePoint = {x: -1000, y: -1000};
+        if(!this.dragging){
+            this.mousePoint = {x: -1000, y: -1000};
+        }
         this.render();
     },
     
@@ -172,8 +174,7 @@ Viewer = Backbone.View.extend({
         "contextmenu #canvas": function(e){ e.preventDefault(); },
         "mousemove #canvas": "mouseMove",
         "mousedown #canvas": "mouseDown",
-        "mouseleave #canvas": "mouseLeave",
-        "mouseup #canvas": "mouseUp"
+        "mouseleave #canvas": "mouseLeave"
     },
     
     renderUI: function(){
