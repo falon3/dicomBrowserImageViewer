@@ -25,6 +25,10 @@ Viewer = Backbone.View.extend({
         this.canvas = this.$("canvas")[0];
         this.context = this.canvas.getContext('2d');
         this.$("#curved").prop("checked", true);
+        
+        this.render = _.debounce(this.render, 1);
+        this.renderUI = _.debounce(this.renderUI, 1);
+        
         this.renderUI();
         this.render();
         
@@ -194,10 +198,6 @@ Viewer = Backbone.View.extend({
     },
 
     render: function(){
-        if(this.slice[0] == undefined){
-            // Something went wrong, try to re-get the slice
-            this.slice = this.$("#slice");
-        }
         this.naturalWidth = this.slice[0].naturalWidth;
         this.naturalHeight = this.slice[0].naturalHeight;
         
@@ -208,7 +208,7 @@ Viewer = Backbone.View.extend({
         
         if(this.canvas.width == 0){
             // Image wasn't done loading yet, try again later...
-            _.defer(this.render);
+            _.defer($.proxy(this.render, this));
             return;
         }
         
