@@ -83,9 +83,7 @@ def index():
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page():
-    with open('StudyList.txt') as f:
-        studies = f.read().splitlines()
-    f.close()
+    studies = file_get_contents(path.dirname(path.realpath(__file__)) + '/StudyList.txt').splitlines()
     return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
