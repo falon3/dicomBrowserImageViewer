@@ -167,6 +167,9 @@ Viewer = Backbone.View.extend({
     
     // Releasing the mouse button
     mouseUp: function(e){
+        if(this.closePoint != null){
+            //this.closePoint.save();
+        }
         this.dragging = false;
         this.mousePoint = {x: -1000, y: -1000};
         this.render();

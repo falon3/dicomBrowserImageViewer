@@ -14,7 +14,7 @@ Point = Backbone.Model.extend({
                 y: this.get('y')};
     },
     
-    urlRoot: '',
+    urlRoot: '/point',
     
     defaults: {
         x: 0,
