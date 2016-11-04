@@ -82,9 +82,9 @@ def index():
 
 @app.route('/upload/', methods=['GET'])
 @login_required
-def load_upload_page():
+def load_upload_page(error=None):
     studies = file_get_contents(path.dirname(path.realpath(__file__)) + '/StudyList.txt').splitlines()
-    return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies)
+    return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies, error=error)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])
@@ -126,7 +126,7 @@ def upload():
     convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
     set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
     if convert != 0:
-        return render_template('upload.html', error="Unable to convert image, needs a DICOM (.dcm) format")
+        return load_upload_page(error="Unable to convert image, needs a DICOM (.dcm) format")
     
     # get db connection cursor
     cursor = g.db.cursor()
@@ -143,7 +143,7 @@ def upload():
         # empty the temp files dir and return error message
         for img in glob.glob(tempsaved+setname+'*'):
             remove(img)
-        return render_template('upload.html', error=err)
+        return load_upload_page(error=err)
             
                                                                        
     # get current image_set id        
