@@ -3,10 +3,12 @@ import hashlib, uuid
 
 class User:
 
-    def __init__(self, username, password, email, userID= None):
+    def __init__(self, username, password, email, acctype= None, userID= None):
         self.name = username
         self.email = email
         self.password = password
+        self.acctype = acctype
+        print(self)
 
         if userID:
             self.userID = userID
@@ -23,8 +25,8 @@ class User:
         # get db connection cursor
         cursor = g.db.cursor()
         cursor.execute(                                                      
-            "INSERT INTO users (name, password, salt, email)"
-            "VALUES (%s, %s, %s, %s)", (self.name, hashed_password, salt, self.email)           
+            "INSERT INTO users (name, password, salt, email, acctype)"
+            "VALUES (%s, %s, %s, %s, %s)", (self.name, hashed_password, salt, self.email, self.acctype)           
         )
         self.userID = getIDbyUsername(self.name)
 
@@ -48,8 +50,13 @@ def checkCurrentUser():
         # get db connection cursor
         cursor = g.db.cursor()
 
-        cursor.execute("SELECT name, email, id FROM users WHERE name = %s", (username))
+        cursor.execute("SELECT name, email, acctype, id FROM users WHERE name = %s", (username))
         data = cursor.fetchone()
-        g.currentUser = User(data[0], None, data[1], data[2])
-    except:
+        print(data)
+        g.currentUser = User(data[0], None, data[1], data[2], data[3])
+
+    except Exception as e:
         g.currentUser = None
+        
+    
+    return g.currentUser 

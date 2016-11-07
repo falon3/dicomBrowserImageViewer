@@ -213,15 +213,14 @@ def get_image(img_id):
 
 @app.route("/authenticate/", methods=['GET', 'POST'])
 def Authenticate():
-    checkCurrentUser()
     
-    if g.currentUser != None:
+    if checkCurrentUser() != None:
         # Already logged in!
         return redirect("/")
 
     username = request.form.get('username')
     password = request.form.get('password')
-    
+
     if(username is None and password is None):
         return render_template('login.html', title='Login')
 
@@ -243,6 +242,8 @@ def Authenticate():
             response = make_response(redirect("/"))
             session.clear()
             session['username'] = username
+            if checkCurrentUser() == None:
+                return render_template('login.html', title='Login', error= 'server error')
             return response
         else:
             return render_template('login.html', title='Login', error= err)
@@ -256,12 +257,15 @@ def newUser():
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
+    acctype = request.form.get('type')
+    print(acctype, "ACCCTYPE")
 
+    # to handle GET
     if(username is None or password is None or email is None):
         return render_template('newaccount.html', title='New User Registration')
     
     try:
-        g.currentUser = User(username, password, email)
+        g.currentUser = User(username, password, email, acctype)
         # to do check if valid and store in database
         # validate cookies and set current
     except Exception as e:
