@@ -47,6 +47,7 @@ Viewer = Backbone.View.extend({
             images.add(image);
         }, this));
         session.setImages(images);
+        session.save();
         this.sessions.add(session);
         this.currentSession = this.sessions.at(this.sessions.length-1);
         this.renderUI();
@@ -56,6 +57,7 @@ Viewer = Backbone.View.extend({
     // Deletes the selected point
     deletePoint: function(){
         this.closeLine.getPoints().remove(this.closePoint);
+        this.closePoint.destroy();
         this.closePoint = null;
         this.render();
     },
@@ -158,7 +160,9 @@ Viewer = Backbone.View.extend({
                 return;
             }
             else {
-                this.currentSession.getImages().getCurrentImage().getLines().add(new Line());
+                var line = new Line();
+                line.save();
+                this.currentSession.getImages().getCurrentImage().getLines().add(line);
             }
         }
         if(e.button == 0 || e.button == 2){
@@ -167,7 +171,9 @@ Viewer = Backbone.View.extend({
             if(this.closePoint == null){
                 // Adding new point
                 if(this.currentSession.getImages().getCurrentImage().getCurrentLine() == null){
-                    this.currentSession.getImages().getCurrentImage().getLines().add(new Line());
+                    var line = new Line();
+                    line.save();
+                    this.currentSession.getImages().getCurrentImage().getLines().add(line);
                 }
                 this.closePoint = new Point({x: coords.x, y: coords.y});
                 this.currentSession.getImages().getCurrentImage().getCurrentLine().getPoints().add(this.closePoint);
@@ -190,7 +196,7 @@ Viewer = Backbone.View.extend({
     // Releasing the mouse button
     mouseUp: function(e){
         if(this.closePoint != null){
-            //this.closePoint.save();
+            this.closePoint.save();
         }
         this.dragging = false;
         this.mousePoint = {x: -1000, y: -1000};

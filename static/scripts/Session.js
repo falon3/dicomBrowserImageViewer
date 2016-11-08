@@ -12,6 +12,8 @@ Session = Backbone.Model.extend({
         return this.images;
     },
     
+    urlRoot: '/session',
+    
     defaults: function(){
         return {sessionId: ''};
     }

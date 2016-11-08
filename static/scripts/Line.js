@@ -8,7 +8,7 @@ Line = Backbone.Model.extend({
         return this.points;
     },
     
-    urlRoot: '',
+    urlRoot: '/line',
     
     defaults: {
         id: null,
