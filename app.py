@@ -99,7 +99,7 @@ def create_study():
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(
-            "insert into studies (id, name, created_on, num_sessions, user_id)"
+            "insert into studies (id, name, created_on, num_sessions, user_id) "
             "VALUES (NULL, %s, NULL, %s, %s)", (name, sessions, g.currentUser.userID)             
         )
     except Exception as e:
@@ -121,6 +121,7 @@ def display_studies():
                    "GROUP BY s.id")
     data = cursor.fetchall()
     study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4] } for study in data}
+
     return render_template('studies.html', title='Studies', result = study_dict)    
 
 @app.route('/upload/', methods=['GET'])

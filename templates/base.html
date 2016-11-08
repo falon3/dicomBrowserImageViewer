@@ -14,7 +14,7 @@
                         <div id="logout">
                             <span id="currentuser">
                                 <img class="img-circle" src="{{ url_for('static', filename='userIcon.png') }}" style="width:30px;height:30px;" >
-                                {{ g.currentUser.name }}
+                                {{ g.currentUser.name }} ({{g.currentUser.acctype}})
                             </span> 
                             <a href="/logout">Logout</a>
                         </div>
