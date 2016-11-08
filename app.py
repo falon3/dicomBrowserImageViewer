@@ -71,13 +71,13 @@ def after_request(response):
 @login_required
 def index():
     cursor = g.db.cursor()
-    cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start "
+    cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start, s.study "
                    "FROM image_sets s, images i "
                    "WHERE user_id = %s "
                    "AND i.set_id = s.id "
                    "GROUP BY s.id", (g.currentUser.userID))
     data = cursor.fetchall()
-    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2) } for set in data}
+    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2), 'study': set[5] } for set in data}
     return render_template('userpictures.html', title='my images', result = img_dict)    
 
 @app.route('/upload/', methods=['GET'])
@@ -133,8 +133,8 @@ def upload():
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(
-            "INSERT INTO image_sets (user_id, name)"                         
-            "VALUES (%s, %s)", (g.currentUser.userID, setname)             
+            "INSERT INTO image_sets (user_id, name, study)"                         
+            "VALUES (%s, %s, %s)", (g.currentUser.userID, setname, study)             
         )
     except Exception as e:
         err = e[1]
