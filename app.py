@@ -71,13 +71,13 @@ def after_request(response):
 @login_required
 def index():
     cursor = g.db.cursor()
-    cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start "
+    cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start, s.study "
                    "FROM image_sets s, images i "
                    "WHERE user_id = %s "
                    "AND i.set_id = s.id "
                    "GROUP BY s.id", (g.currentUser.userID))
     data = cursor.fetchall()
-    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2) } for set in data}
+    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2), 'study': set[5] } for set in data}
     return render_template('userpictures.html', title='my images', result = img_dict)    
 
 @app.route('/upload/', methods=['GET'])
@@ -133,8 +133,8 @@ def upload():
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(
-            "INSERT INTO image_sets (user_id, name)"                         
-            "VALUES (%s, %s)", (g.currentUser.userID, setname)             
+            "INSERT INTO image_sets (user_id, name, study)"                         
+            "VALUES (%s, %s, %s)", (g.currentUser.userID, setname, study)             
         )
     except Exception as e:
         err = e[1]
@@ -213,15 +213,14 @@ def get_image(img_id):
 
 @app.route("/authenticate/", methods=['GET', 'POST'])
 def Authenticate():
-    checkCurrentUser()
     
-    if g.currentUser != None:
+    if checkCurrentUser() != None:
         # Already logged in!
         return redirect("/")
 
     username = request.form.get('username')
     password = request.form.get('password')
-    
+
     if(username is None and password is None):
         return render_template('login.html', title='Login')
 
@@ -243,6 +242,8 @@ def Authenticate():
             response = make_response(redirect("/"))
             session.clear()
             session['username'] = username
+            if checkCurrentUser() == None:
+                return render_template('login.html', title='Login', error= 'server error')
             return response
         else:
             return render_template('login.html', title='Login', error= err)
@@ -256,12 +257,15 @@ def newUser():
     username = request.form.get('username')
     password = request.form.get('password')
     email = request.form.get('email')
+    acctype = request.form.get('type')
+    print(acctype, "ACCCTYPE")
 
+    # to handle GET
     if(username is None or password is None or email is None):
         return render_template('newaccount.html', title='New User Registration')
     
     try:
-        g.currentUser = User(username, password, email)
+        g.currentUser = User(username, password, email, acctype)
         # to do check if valid and store in database
         # validate cookies and set current
     except Exception as e:

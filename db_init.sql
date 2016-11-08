@@ -23,7 +23,9 @@ then from there copy past this dump into your command line
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
+
+
+-- ORDER MATTERS!!!
 -- Table structure for table `users`
 -- FIRST
 
@@ -36,16 +38,38 @@ CREATE TABLE `users` (
   `password` varchar(256) NOT NULL DEFAULT '',
   `salt` varchar(256) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `acctype` varchar(30) NOT NULL DEFAULT 'Tech',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+
+--
+-- Table structure for table `studies`
+-- SECOND
+
+DROP TABLE IF EXISTS `studies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `studies` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `num_sessions` int(2) NOT NULL DEFAULT '3',
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `studies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `image_sets`
--- SECOND
+-- THIRD
 
 DROP TABLE IF EXISTS `image_sets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -55,16 +79,18 @@ CREATE TABLE `image_sets` (
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `study` varchar(100) DEFAULT NULL,
+  `study` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uni` (`user_id`,`name`),
+  KEY `fk_study` (`study`),
+  CONSTRAINT `fk_study` FOREIGN KEY (`study`) REFERENCES `studies` (`name`),
   CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `images`
--- THREE
+-- FOURTH
 
 DROP TABLE IF EXISTS `images`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -81,7 +107,7 @@ CREATE TABLE `images` (
 
 --
 -- Table structure for table `sessions`
--- FOURTH
+-- FIFTH
 
 DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -91,11 +117,13 @@ CREATE TABLE `sessions` (
   `set_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `study` varchar(50) NOT NULL DEFAULT '',
   `color` varchar(6) NOT NULL DEFAULT 'FF0000',
+  `study_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `set_id` (`set_id`),
   KEY `user_id` (`user_id`),
+  KEY `fk_study_id` (`study_id`),
+  CONSTRAINT `fk_study_id` FOREIGN KEY (`study_id`) REFERENCES `studies` (`id`),
   CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`),
   CONSTRAINT `sessions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -103,7 +131,7 @@ CREATE TABLE `sessions` (
 
 --
 -- Table structure for table `lines`
--- FIVE
+-- SIXTH
 
 DROP TABLE IF EXISTS `lines`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -123,7 +151,7 @@ CREATE TABLE `lines` (
 
 --
 -- Table structure for table `points`
--- SIXTH
+-- SEVENTH
 
 DROP TABLE IF EXISTS `points`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -141,7 +169,6 @@ CREATE TABLE `points` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
-
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -150,4 +177,4 @@ CREATE TABLE `points` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-03 13:24:30
+-- Dump completed on 2016-11-07 13:50:08
