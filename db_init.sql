@@ -117,11 +117,13 @@ CREATE TABLE `sessions` (
   `set_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL DEFAULT '',
-  `study` varchar(50) NOT NULL DEFAULT '',
   `color` varchar(6) NOT NULL DEFAULT 'FF0000',
+  `study_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `set_id` (`set_id`),
   KEY `user_id` (`user_id`),
+  KEY `fk_study_id` (`study_id`),
+  CONSTRAINT `fk_study_id` FOREIGN KEY (`study_id`) REFERENCES `studies` (`id`),
   CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`),
   CONSTRAINT `sessions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
