@@ -27,7 +27,6 @@ Viewer = Backbone.View.extend({
         this.renderUI = _.debounce(this.renderUI, 1);
         
         this.addSession();
-        this.currentSession = this.sessions.at(0);
         
         this.renderUI();
         this.render();
@@ -39,6 +38,7 @@ Viewer = Backbone.View.extend({
         $(window).mouseup($.proxy(this.mouseUp, this));
     },
     
+    // Adding a new session
     addSession: function(){
         var session = new Session({sessionId: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
         var images = new Images();
@@ -48,6 +48,7 @@ Viewer = Backbone.View.extend({
         }, this));
         session.setImages(images);
         this.sessions.add(session);
+        this.currentSession = this.sessions.at(this.sessions.length-1);
         this.renderUI();
         this.render();
     },
@@ -117,13 +118,6 @@ Viewer = Backbone.View.extend({
         this.render();
     },
     
-    clickSession: function(e){
-        var el = e.currentTarget;
-        this.currentSession = this.sessions.findWhere({'sessionId': $(el).text()});
-        this.renderUI();
-        this.render();
-    },
-    
     relMouseCoords: function(e){
         coords = this.canvas.relMouseCoords(e);
         coords.x *= this.scalingFactor;
@@ -131,6 +125,14 @@ Viewer = Backbone.View.extend({
         coords.x = Math.min(Math.max(coords.x, this.RADIUS), this.naturalWidth-this.RADIUS);
         coords.y = Math.min(Math.max(coords.y, this.RADIUS), this.naturalHeight-this.RADIUS);
         return coords;
+    },
+    
+    // Clicking on the session to display
+    clickSession: function(e){
+        var el = e.currentTarget;
+        this.currentSession = this.sessions.findWhere({'sessionId': $(el).text()});
+        this.renderUI();
+        this.render();
     },
     
     // Moving the mouse coordinates
