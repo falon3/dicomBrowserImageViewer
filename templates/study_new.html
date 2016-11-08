@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/upload.js') }}"></script>
+
+<form enctype="multipart/form-data" method="post" action="{{ url_for('display_studies') }}">
+    <label for="Name"> Please enter a name for the Study: </label>
+    <input type="text" name= "name" id="name" required /><br/>
+    <label for="sessions"> # Sessions per Participant </label>
+    <input type="number" name= "sessions" id="sessions" required><br/>
+    <input type="submit" value="Create Study" id="createStudy"/>
+</form>
+{% endblock %}
