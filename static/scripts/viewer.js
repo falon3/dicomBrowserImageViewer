@@ -3,7 +3,8 @@ Viewer = Backbone.View.extend({
     RADIUS: 2.5,
     SEGMENTS: 18,
     
-    images: new Images(),
+    sessions: new Sessions(),
+    currentSession: null,
     mousePoint: {x: -1000, y: -1000},
     closeLine: null,
     closePoint: null,
@@ -17,10 +18,6 @@ Viewer = Backbone.View.extend({
     context: null,
 
     initialize: function(){
-        _.each($("#preCachedImages img"), $.proxy(function(img, i){
-            var image = new Image({src: $(img).attr('src')});
-            this.images.add(image);
-        }, this));
         this.slice = this.$("#slice");
         this.canvas = this.$("canvas")[0];
         this.context = this.canvas.getContext('2d');
@@ -28,6 +25,9 @@ Viewer = Backbone.View.extend({
         
         this.render = _.debounce(this.render, 1);
         this.renderUI = _.debounce(this.renderUI, 1);
+        
+        this.addSession();
+        this.currentSession = this.sessions.at(0);
         
         this.renderUI();
         this.render();
@@ -37,6 +37,19 @@ Viewer = Backbone.View.extend({
         $(window).bind('keyup', $.proxy(function(e){ if(e.keyCode == 46){ this.deletePoint(); }}, this)),
         $(window).resize($.proxy(this.render, this));
         $(window).mouseup($.proxy(this.mouseUp, this));
+    },
+    
+    addSession: function(){
+        var session = new Session({sessionId: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
+        var images = new Images();
+        _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
+            var image = new Image({src: $(img).attr('src')});
+            images.add(image);
+        }, this));
+        session.setImages(images);
+        this.sessions.add(session);
+        this.renderUI();
+        this.render();
     },
     
     // Deletes the selected point
@@ -59,14 +72,14 @@ Viewer = Backbone.View.extend({
     
     // Display the previous image
     previous: function(e){
-        this.images.previous();
+        this.currentSession.getImages().previous();
         this.renderUI();
         this.render();
     },
     
     // Display the next image
     next: function(e){
-        this.images.next();
+        this.currentSession.getImages().next();
         this.renderUI();
         this.render();
     },
@@ -75,13 +88,13 @@ Viewer = Backbone.View.extend({
     scroll: function(e){
         if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
             // Go to the previous image
-            if(!this.images.isFirst()){
+            if(!this.currentSession.getImages().isFirst()){
                 this.previous();
             }
         }
         else {
             // Go to the next image
-            if(!this.images.isLast()){
+            if(!this.currentSession.getImages().isLast()){
                 this.next();
             }
         }
@@ -104,6 +117,13 @@ Viewer = Backbone.View.extend({
         this.render();
     },
     
+    clickSession: function(e){
+        var el = e.currentTarget;
+        this.currentSession = this.sessions.findWhere({'sessionId': $(el).text()});
+        this.renderUI();
+        this.render();
+    },
+    
     relMouseCoords: function(e){
         coords = this.canvas.relMouseCoords(e);
         coords.x *= this.scalingFactor;
@@ -119,7 +139,7 @@ Viewer = Backbone.View.extend({
         this.mousePoint = coords;
         if(this.dragging){
             if(this.closeLine == null){
-                this.closeLine = this.images.getCurrentImage().getCurrentLine();
+                this.closeLine = this.currentSession.getImages().getCurrentImage().getCurrentLine();
             }
             this.closePoint.setCoords(this.mousePoint);
         }
@@ -136,7 +156,7 @@ Viewer = Backbone.View.extend({
                 return;
             }
             else {
-                this.images.getCurrentImage().getLines().add(new Line());
+                this.currentSession.getImages().getCurrentImage().getLines().add(new Line());
             }
         }
         if(e.button == 0 || e.button == 2){
@@ -144,14 +164,14 @@ Viewer = Backbone.View.extend({
             this.dragging = true;
             if(this.closePoint == null){
                 // Adding new point
-                if(this.images.getCurrentImage().getCurrentLine() == null){
-                    this.images.getCurrentImage().getLines().add(new Line());
+                if(this.currentSession.getImages().getCurrentImage().getCurrentLine() == null){
+                    this.currentSession.getImages().getCurrentImage().getLines().add(new Line());
                 }
                 this.closePoint = new Point({x: coords.x, y: coords.y});
-                this.images.getCurrentImage().getCurrentLine().getPoints().add(this.closePoint);
+                this.currentSession.getImages().getCurrentImage().getCurrentLine().getPoints().add(this.closePoint);
             }
             else{
-                this.images.getCurrentImage().setCurrentLine(this.closeLine);
+                this.currentSession.getImages().getCurrentImage().setCurrentLine(this.closeLine);
             }
         }
         this.render();
@@ -180,31 +200,41 @@ Viewer = Backbone.View.extend({
         "click #next": "next",
         "change #curved": "changeSegments",
         "click #fullscreen a": "toggleFullScreen",
+        "click #sessions > div": "clickSession",
+        "click #addSession": "addSession",
         "contextmenu #canvas": function(e){ e.preventDefault(); },
         "mousemove #canvas": "mouseMove",
         "mousedown #canvas": "mouseDown",
-        "mouseleave #canvas": "mouseLeave"
+        "mouseleave #canvas": "mouseLeave",
     },
     
     renderUI: function(){
         // Changing the image
-        this.slice.attr("src", this.images.getCurrentImage().get('src'));
-        this.$("#currentImage").text(this.images.currentId+1);
-        this.$("#maxImage").text(this.images.length);
+        this.slice.attr("src", this.currentSession.getImages().getCurrentImage().get('src'));
+        this.$("#currentImage").text(this.currentSession.getImages().currentId+1);
+        this.$("#maxImage").text(this.currentSession.getImages().length);
         
         // Updating button appearance
-        if(this.images.isFirst()){
+        if(this.currentSession.getImages().isFirst()){
             this.$("#previous").prop('disabled', true);
         }
         else{
             this.$("#previous").prop('disabled', false);
         }
-        if(this.images.isLast()){
+        if(this.currentSession.getImages().isLast()){
             this.$("#next").prop('disabled', true);
         }
         else{
             this.$("#next").prop('disabled', false);
         }
+        this.$("#sessions").empty();
+        this.sessions.each(function(session){
+            var html = $("<div>" + session.get('sessionId') + "</div>");
+            if(session == this.currentSession){
+                html.addClass('selected');
+            }
+            this.$("#sessions").append(html);
+        }, this);
     },
 
     render: function(){
@@ -227,7 +257,7 @@ Viewer = Backbone.View.extend({
             this.closeLine = null;
         }
         
-        this.images.getCurrentImage().getLines().each(function(line, i){
+        this.currentSession.getImages().getCurrentImage().getLines().each(function(line, i){
             var curvePoints = new Array();
             line.getPoints().each(function(point, j){
                 curvePoints.push(point.get('x')/this.scalingFactor);
@@ -241,7 +271,7 @@ Viewer = Backbone.View.extend({
             
             this.context.drawCurve(curvePoints, 0.5, false, this.segments);
             this.context.strokeStyle = line.get('color');
-            if(line == this.images.getCurrentImage().getCurrentLine()){
+            if(line == this.currentSession.getImages().getCurrentImage().getCurrentLine()){
                 this.context.lineWidth = 2/this.scalingFactor;
             }
             else{

@@ -193,6 +193,26 @@ div#middleViewer {
     margin: 15px;
 }
 
+div#sessionContainer {
+    vertical-align: top;
+    min-width: 200px;
+    display: inline-block;
+}
+
+div#sessions > div {
+    padding: 5px;
+}
+
+div#sessions > div.selected {
+    background: #191919;
+}
+
+div#sessions > div:hover {
+    color: white;
+    background: #191919;
+    cursor: pointer;
+}
+
 div#bottomViewer {
     min-width: 500px;
     height: 44px;
