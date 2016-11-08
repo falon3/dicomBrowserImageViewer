@@ -4,14 +4,15 @@
 
 
 <button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
+<button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >View Studies</button>
 <br><br>
 <table class="display" width="100%" cellspacing="0" id="imageTable">  
     <thead>  
         <tr>
             <th width="1%">Preview</th>
             <th>Image Set Name</th>
-            <th>Date Uploaded</th>
             <th>Study</th>
+            <th>Date Uploaded</th>
             <th># Images</th>
         </tr>
     </thead>
@@ -20,8 +21,8 @@
         <tr>
             <td align="center"><a href="/viewset/{{ value['id'] }}:{{ key }}"><img style="max-width:75px; max-height: 75px;" src="upload/{{ value['mid'] }}" /></a></td>
             <td> <a href="/viewset/{{ value['id'] }}:{{ key }}">{{ key }}</a></td>
-            <td> {{ value['timestamp'] }}</td>
             <td> {{ value['study'] }} </td>
+            <td> {{ value['timestamp'] }}</td>
             <td align="right"> {{ value['count'] }} </td>
         </tr>
         {% endfor %}

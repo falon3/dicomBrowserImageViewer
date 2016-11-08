@@ -67,6 +67,7 @@ def after_request(response):
         g.db = None
     return response
 
+
 @app.route('/')
 @login_required
 def index():
@@ -80,10 +81,55 @@ def index():
     img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2), 'study': set[5] } for set in data}
     return render_template('userpictures.html', title='my images', result = img_dict)    
 
+@app.route('/studies/create/', methods=['GET'])
+@login_required
+def new_study(error=''):
+     return render_template('study_new.html', title='Studies', error=error)
+
+
+@app.route('/studies/', methods=['POST'])
+@login_required
+def create_study():
+    name = request.form.get('name')
+    name = re.sub('[^A-Za-z0-9]+', '', name)
+    sessions = request.form.get('sessions')
+
+    # get db connection cursor
+    cursor = g.db.cursor()
+    # create UNIQUE image set for this user and setname in database
+    try:
+        cursor.execute(
+            "insert into studies (id, name, created_on, num_sessions, user_id)"
+            "VALUES (NULL, %s, NULL, %s, %s)", (name, sessions, g.currentUser.userID)             
+        )
+    except Exception as e:
+        err = e[1]
+        if "Duplicate" in err:
+            err = "Study name already Exists!"
+        return new_study(err)
+            
+    return display_studies()
+
+
+@app.route('/studies/', methods=['GET'])
+@login_required
+def display_studies():
+    cursor = g.db.cursor()
+    cursor.execute("SELECT s.name, s.id, s.created_on, num_sessions, u.name  "
+                   "FROM studies s, users u "
+                   "WHERE s.user_id = u.id "
+                   "GROUP BY s.id")
+    data = cursor.fetchall()
+    study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4] } for study in data}
+    return render_template('studies.html', title='Studies', result = study_dict)    
+
 @app.route('/upload/', methods=['GET'])
 @login_required
-def load_upload_page(error=None):
-    studies = file_get_contents(path.dirname(path.realpath(__file__)) + '/StudyList.txt').splitlines()
+def load_upload_page(error=''):
+    cursor = g.db.cursor()
+    cursor.execute("SELECT s.name FROM studies s GROUP BY s.id")
+    data = cursor.fetchall()
+    studies = [study[0] for study in data]
     return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies, error=error)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
@@ -133,7 +179,7 @@ def upload():
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(
-            "INSERT INTO image_sets (user_id, name, study)"                         
+            "INSERT INTO image_sets (user_id, name, study)"                      
             "VALUES (%s, %s, %s)", (g.currentUser.userID, setname, study)             
         )
     except Exception as e:
