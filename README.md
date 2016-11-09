@@ -11,6 +11,12 @@ $ source ./flask/bin/activate
 $ pip install -r requirements.txt
 ```
     
+Copy the settings.py.sample file to settings.py and edit the values in the file in order to be able to connect to your database.
+To initialize your database (which has to already be created) run the following command:
+```
+$ db-migrate
+```
+ 
 # to setup with apache
 edit the apache config file (ie. /etc/apache2/apache2.conf) to add with something like the following
 
