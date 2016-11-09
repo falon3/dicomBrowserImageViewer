@@ -141,82 +141,88 @@ def load_upload_page(error=''):
 def upload():
     setname = request.form.get('filename')
     setname = re.sub('[^A-Za-z0-9]+', '', setname)
-    imagefile = request.files.get('imagefile', '')
-    study = request.form.get('study')
-    
-    #TODO: save study if not null into image_sets study column
-  
-    # save locally temp to convert from dicom to jpg format
-    tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
-    if not path.exists(tempsaved):
-        makedirs(tempsaved)
-    imagefile.save(tempsaved+setname)
-    
-    try:
-        output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname)])
-        matched_lines = [line for line in output.split(',')]
-        rows, cols = matched_lines[0].strip().split('\\')
-        rows = float(rows)
-        cols = float(cols)
+    imagefiles = request.files.getlist('imagefile')
+    study = request.form.get('study')    
+    first = {'name': setname+"-"+imagefiles[0].filename}
+
+    for dicom in imagefiles:
+        name = str(dicom.filename.strip('.dcm'))
+        print(name)
+        # save locally temp to convert from dicom to jpg format
+        tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
+        if not path.exists(tempsaved):
+            makedirs(tempsaved)
+
+        dicom.save(tempsaved+setname+"-"+name)    
+        try:
+            output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname+"-"+name)])
+            matched_lines = [line for line in output.split(',')]
+            rows, cols = matched_lines[0].strip().split('\\')
+            rows = float(rows)
+            cols = float(cols)
         
-        resize = ""
-        if(rows == cols):
-            # no resize needed
+            resize = ""
+            if(rows == cols):
+                # no resize needed
+                resize = "100%x100%"
+            elif (cols > rows):
+                factor = (cols/rows)*100
+                resize = str(factor) + "%x100%"
+            elif (rows > cols):
+                factor = (rows/cols)*100
+                resize = "100%x" + str(factor) + "%"
+        except:
             resize = "100%x100%"
-        elif (cols > rows):
-            factor = (cols/rows)*100
-            resize = str(factor) + "%x100%"
-        elif (rows > cols):
-            factor = (rows/cols)*100
-            resize = "100%x" + str(factor) + "%"
-    except:
-        resize = "100%x100%"
     
-    convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname])
-    set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
-    if convert != 0:
-        return load_upload_page(error="Unable to convert image, needs a DICOM (.dcm) format")
+        convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname+"-"+name])
+        set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
+        if convert != 0:
+            return load_upload_page(error="Unable to convert image, needs a DICOM (.dcm) format")
     
-    # get db connection cursor
-    cursor = g.db.cursor()
-    # create UNIQUE image set for this user and setname in database
-    try:
-        cursor.execute(
-            "INSERT INTO image_sets (user_id, name, study)"                      
-            "VALUES (%s, %s, %s)", (g.currentUser.userID, setname, study)             
-        )
-    except Exception as e:
-        err = e[1]
-        if "Duplicate" in err:
-            err = "Image set name already used for this user"
-        # empty the temp files dir and return error message
-        for img in glob.glob(tempsaved+setname+'*'):
-            remove(img)
-        return load_upload_page(error=err)
+        # get db connection cursor
+        cursor = g.db.cursor()
+        # create UNIQUE image set for this user and setname in database
+        try:
+            cursor.execute(
+                "INSERT INTO image_sets (user_id, name, study)"                      
+                "VALUES (%s, %s, %s)", (g.currentUser.userID, setname+"-"+name, study)             
+            )
+        except Exception as e:
+            err = e[1]
+            if "Duplicate" in err:
+                err = "Image set name and DICOM already used for this user"
+            # empty the temp files dir and return error message
+            for img in glob.glob(tempsaved+setname+"-"+name+'*'):
+                remove(img)
+            return load_upload_page(error=err)
             
                                                                        
-    # get current image_set id        
-    cursor.execute("SELECT id FROM image_sets WHERE name='" + setname + "'") 
-    current_setid = cursor.fetchone()[0]  
+        # get current image_set id        
+        cursor.execute("SELECT id FROM image_sets WHERE name='" + setname+"-"+name + "'") 
+        current_setid = cursor.fetchone()[0]  
+        if (not 'id' in first.keys()):
+            first['id'] = current_setid
     
-    # save all in set as blobs in images table in database in correct order
-    for index in range(set_size):
-        if(set_size > 1):
-            picture = tempsaved + setname + "-" + str(index) + ".jpg"
-        else:
-            picture = tempsaved + setname + ".jpg"
-        picture = path.abspath(picture)
-        contents = file_get_contents(picture)
+        # save all in set as blobs in images table in database in correct order
+        for index in range(set_size):
+            if(set_size > 1):
+                picture = tempsaved + setname + "-" + name + "-" + str(index) + ".jpg"
+            else:
+                picture = tempsaved + setname + "-" + name + ".jpg"
+            picture = path.abspath(picture)
+            contents = file_get_contents(picture)
 
-        cursor.execute(
-            "INSERT INTO images (id, set_id, image)"
-            "VALUES (NULL, %s, %s)", (current_setid, contents) 
-        )
-        if set_size > 2:
-            remove(picture) # delete temp files
+            cursor.execute(
+                "INSERT INTO images (id, set_id, image)"
+                "VALUES (NULL, %s, %s)", (current_setid, contents) 
+            )
+            if set_size > 2:
+                remove(picture) # delete temp files
         
-    remove(tempsaved+setname) # delete original
-    return redirect("/viewset/"+ str(current_setid) +':'+ setname, code=302)
+        remove(tempsaved+setname+"-"+name) # delete original
+
+    # go to viewer at first DICOM set if there were multiple
+    return redirect("/viewset/"+ str(first['id']) +':'+ first['name'], code=302)
     
 # gets image set details from database to pass to template
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
