@@ -33,6 +33,9 @@ app.config.from_object(__name__)
 app.permanent_session_lifetime = datetime.timedelta(hours=1)
 Session(app)
 
+#global
+num_jpgs = 256
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -76,13 +79,25 @@ def index():
         setname = ''
 
     cursor = g.db.cursor()
-    cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start, s.study "
+    # get all image set info to be displayed in table
+    cursor.execute("SELECT s.name, s.id, s.created_on, MIN(i.id) as start, s.study, COUNT(*) "
                    "FROM image_sets s, images i "
                    "WHERE user_id = %s "
                    "AND i.set_id = s.id "
                    "GROUP BY s.id", (g.currentUser.userID))
     data = cursor.fetchall()
-    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2), 'study': set[5] } for set in data}
+    img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'start': set[3], 'mid': int(set[3] + set[5]/2), 'study': set[4] } for set in data}
+
+    # count how many DICOMS in same prefixed studyname
+    cursor.execute("Select DISTINCT LEFT(i.name, INSTR(i.name,'-')-1), count(*) "
+                   "FROM image_sets i, image_sets n "
+                   "WHERE LEFT(i.name,INSTR(i.name,'-')-1) = LEFT(n.name,INSTR(n.name,'-')-1) "
+                   "GROUP BY i.name")
+    counts = cursor.fetchall()
+    count_dict = {str(base[0]): base[1] for base in counts}
+    for key in img_dict:
+        img_dict[key]['count'] = count_dict[key.split('-')[0]]
+
     return render_template('userpictures.html', title='my images', result = img_dict, setname=setname)    
 
 @app.route('/studies/create/', methods=['GET'])
@@ -149,7 +164,7 @@ def upload():
     study = request.form.get('study')    
 
     for dicom in imagefiles:
-        fullname = setname + str(dicom.filename.strip('.dcm'))
+        fullname = setname + '-' + str(dicom.filename.strip('.dcm'))
         # save locally temp to convert from dicom to jpg format
         tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
         if not path.exists(tempsaved):
@@ -220,7 +235,7 @@ def upload():
         
         remove(tempsaved+fullname) # delete original
 
-    return redirect("/"+ "?search=" + setname, code=302)  
+    return redirect("/"+ "?search=" + setname , code=302)  
     
 # gets image set details from database to pass to template
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
