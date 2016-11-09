@@ -71,6 +71,10 @@ def after_request(response):
 @app.route('/')
 @login_required
 def index():
+    setname = request.args.get("search")
+    if not setname:
+        setname = ''
+
     cursor = g.db.cursor()
     cursor.execute("SELECT s.name, s.id, s.created_on, COUNT(*) as count, MIN(i.id) as start, s.study "
                    "FROM image_sets s, images i "
@@ -79,7 +83,7 @@ def index():
                    "GROUP BY s.id", (g.currentUser.userID))
     data = cursor.fetchall()
     img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'count': set[3], 'start': set[4], 'mid': int(set[4] + set[3]/2), 'study': set[5] } for set in data}
-    return render_template('userpictures.html', title='my images', result = img_dict)    
+    return render_template('userpictures.html', title='my images', result = img_dict, setname=setname)    
 
 @app.route('/studies/create/', methods=['GET'])
 @login_required
@@ -143,19 +147,17 @@ def upload():
     setname = re.sub('[^A-Za-z0-9]+', '', setname)
     imagefiles = request.files.getlist('imagefile')
     study = request.form.get('study')    
-    first = {'name': setname+"-"+imagefiles[0].filename}
 
     for dicom in imagefiles:
-        name = str(dicom.filename.strip('.dcm'))
-        print(name)
+        fullname = setname + str(dicom.filename.strip('.dcm'))
         # save locally temp to convert from dicom to jpg format
         tempsaved = path.dirname(path.realpath(__file__)) + '/temp/'
         if not path.exists(tempsaved):
             makedirs(tempsaved)
 
-        dicom.save(tempsaved+setname+"-"+name)    
+        dicom.save(tempsaved+fullname)    
         try:
-            output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+setname+"-"+name)])
+            output = subprocess.check_output(['identify', '-format', '%[dcm:PixelSpacing],', str(tempsaved+fullname)])
             matched_lines = [line for line in output.split(',')]
             rows, cols = matched_lines[0].strip().split('\\')
             rows = float(rows)
@@ -174,7 +176,7 @@ def upload():
         except:
             resize = "100%x100%"
     
-        convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+setname+"-"+name])
+        convert = subprocess.call(['mogrify', '-resize', resize, '-format', 'jpg', tempsaved+fullname])
         set_size = len(fnmatch.filter(listdir(tempsaved), '*.jpg'))
         if convert != 0:
             return load_upload_page(error="Unable to convert image, needs a DICOM (.dcm) format")
@@ -185,30 +187,27 @@ def upload():
         try:
             cursor.execute(
                 "INSERT INTO image_sets (user_id, name, study)"                      
-                "VALUES (%s, %s, %s)", (g.currentUser.userID, setname+"-"+name, study)             
+                "VALUES (%s, %s, %s)", (g.currentUser.userID, fullname, study)             
             )
         except Exception as e:
             err = e[1]
             if "Duplicate" in err:
                 err = "Image set name and DICOM already used for this user"
             # empty the temp files dir and return error message
-            for img in glob.glob(tempsaved+setname+"-"+name+'*'):
+            for img in glob.glob(tempsaved+fullname+'*'):
                 remove(img)
             return load_upload_page(error=err)
             
-                                                                       
         # get current image_set id        
-        cursor.execute("SELECT id FROM image_sets WHERE name='" + setname+"-"+name + "'") 
+        cursor.execute("SELECT id FROM image_sets WHERE name='" + fullname + "'") 
         current_setid = cursor.fetchone()[0]  
-        if (not 'id' in first.keys()):
-            first['id'] = current_setid
     
         # save all in set as blobs in images table in database in correct order
         for index in range(set_size):
             if(set_size > 1):
-                picture = tempsaved + setname + "-" + name + "-" + str(index) + ".jpg"
+                picture = tempsaved + fullname + "-" + str(index) + ".jpg"
             else:
-                picture = tempsaved + setname + "-" + name + ".jpg"
+                picture = tempsaved + fullname + ".jpg"
             picture = path.abspath(picture)
             contents = file_get_contents(picture)
 
@@ -219,10 +218,9 @@ def upload():
             if set_size > 2:
                 remove(picture) # delete temp files
         
-        remove(tempsaved+setname+"-"+name) # delete original
+        remove(tempsaved+fullname) # delete original
 
-    # go to viewer at first DICOM set if there were multiple
-    return redirect("/viewset/"+ str(first['id']) +':'+ first['name'], code=302)
+    return redirect("/"+ "?search=" + setname, code=302)  
     
 # gets image set details from database to pass to template
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])

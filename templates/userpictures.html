@@ -19,7 +19,7 @@
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr>
-            <td align="center"><a href="/viewset/{{ value['id'] }}:{{ key }}"><img style="max-width:75px; max-height: 75px;" src="upload/{{ value['mid'] }}" /></a></td>
+            <td align="center"><a href="/viewset/{{ value['id'] }}:{{ key }}"><img style="max-width:75px; max-height: 75px;" src="/upload/{{ value['mid'] }}" /></a></td>
             <td> <a href="/viewset/{{ value['id'] }}:{{ key }}">{{ key }}</a></td>
             <td> {{ value['study'] }} </td>
             <td> {{ value['timestamp'] }}</td>
@@ -29,7 +29,7 @@
     </tbody>
 </table>
 <script type="text/javascript">
-    $("#imageTable").DataTable();
+    $("#imageTable").DataTable({oSearch:{sSearch:"{{setname}}"}});
 </script>
 
 {% endblock %}
