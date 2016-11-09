@@ -12,10 +12,13 @@ Session = Backbone.Model.extend({
         return this.images;
     },
     
-    urlRoot: '/session',
+    urlRoot: '/api/session',
     
     defaults: function(){
-        return {sessionId: ''};
+        return {set_id: '',
+                study_id: '',
+                name: '',
+                user_id: ''};
     }
 
 });
@@ -23,5 +26,9 @@ Session = Backbone.Model.extend({
 Sessions = Backbone.Collection.extend({
 
     model: Session,
+    
+    url: function(){
+        return '/api/sessions';
+    }
 
 });

@@ -8,7 +8,7 @@ Line = Backbone.Model.extend({
         return this.points;
     },
     
-    urlRoot: '/line',
+    urlRoot: '/api/line',
     
     defaults: {
         id: null,
@@ -40,7 +40,7 @@ Lines = Backbone.Collection.extend({
     },
     
     url: function(){
-        return '';
+        return '/api/lines';
     }
 
 });

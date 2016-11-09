@@ -40,7 +40,7 @@ Viewer = Backbone.View.extend({
     
     // Adding a new session
     addSession: function(){
-        var session = new Session({sessionId: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
+        var session = new Session({name: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
         var images = new Images();
         _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
             var image = new Image({src: $(img).attr('src')});
@@ -132,7 +132,7 @@ Viewer = Backbone.View.extend({
     // Clicking on the session to display
     clickSession: function(e){
         var el = e.currentTarget;
-        this.currentSession = this.sessions.findWhere({'sessionId': $(el).text()});
+        this.currentSession = this.sessions.findWhere({'name': $(el).text()});
         this.renderUI();
         this.render();
     },
@@ -237,7 +237,7 @@ Viewer = Backbone.View.extend({
         }
         this.$("#sessions").empty();
         this.sessions.each(function(session){
-            var html = $("<div>" + session.get('sessionId') + "</div>");
+            var html = $("<div>" + session.get('name') + "</div>");
             if(session == this.currentSession){
                 html.addClass('selected');
             }

@@ -14,7 +14,7 @@ Point = Backbone.Model.extend({
                 y: this.get('y')};
     },
     
-    urlRoot: '/point',
+    urlRoot: '/api/point',
     
     defaults: {
         x: 0,
@@ -29,7 +29,7 @@ Points = Backbone.Collection.extend({
     model: Point,
     
     url: function(){
-        return '';
+        return '/api/points';
     }
 
 });
