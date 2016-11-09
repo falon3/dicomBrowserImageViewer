@@ -84,7 +84,9 @@ def index():
 @app.route('/studies/create/', methods=['GET'])
 @login_required
 def new_study(error=''):
-     return render_template('study_new.html', title='Studies', error=error)
+    if (g.currentUser.acctype != 'Researcher'):
+        return display_studies('insufficient permissions to create a study')
+    return render_template('study_new.html', title='Studies', error=error)
 
 
 @app.route('/studies/', methods=['POST'])
@@ -99,7 +101,7 @@ def create_study():
     # create UNIQUE image set for this user and setname in database
     try:
         cursor.execute(
-            "insert into studies (id, name, created_on, num_sessions, user_id)"
+            "insert into studies (id, name, created_on, num_sessions, user_id) "
             "VALUES (NULL, %s, NULL, %s, %s)", (name, sessions, g.currentUser.userID)             
         )
     except Exception as e:
@@ -113,7 +115,7 @@ def create_study():
 
 @app.route('/studies/', methods=['GET'])
 @login_required
-def display_studies():
+def display_studies(error=''):
     cursor = g.db.cursor()
     cursor.execute("SELECT s.name, s.id, s.created_on, num_sessions, u.name  "
                    "FROM studies s, users u "
@@ -121,7 +123,8 @@ def display_studies():
                    "GROUP BY s.id")
     data = cursor.fetchall()
     study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4] } for study in data}
-    return render_template('studies.html', title='Studies', result = study_dict)    
+
+    return render_template('studies.html', title='Studies', error=error, result = study_dict)    
 
 @app.route('/upload/', methods=['GET'])
 @login_required
