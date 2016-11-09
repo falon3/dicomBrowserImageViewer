@@ -7,10 +7,8 @@ This project is specifically intended to be used for assessing dicom images of h
 inside of project directory run the following commands
 ```
 $ virtualenv flask
-$ flask/bin/pip install flask
-$ pip install flask-mysql
-$ pip install Flask-Session
-
+$ source ./flask/bin/activate
+$ pip install -r requirements.txt
 ```
     
 # to setup with apache

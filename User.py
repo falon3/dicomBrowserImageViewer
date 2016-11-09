@@ -8,7 +8,6 @@ class User:
         self.email = email
         self.password = password
         self.acctype = acctype
-        print(self)
 
         if userID:
             self.userID = userID
@@ -52,7 +51,6 @@ def checkCurrentUser():
 
         cursor.execute("SELECT name, email, acctype, id FROM users WHERE name = %s", (username))
         data = cursor.fetchone()
-        print(data)
         g.currentUser = User(data[0], None, data[1], data[2], data[3])
 
     except Exception as e:

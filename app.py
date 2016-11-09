@@ -307,7 +307,6 @@ def newUser():
     password = request.form.get('password')
     email = request.form.get('email')
     acctype = request.form.get('type')
-    print(acctype, "ACCCTYPE")
 
     # to handle GET
     if(username is None or password is None or email is None):

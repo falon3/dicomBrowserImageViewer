@@ -263,6 +263,7 @@ Viewer = Backbone.View.extend({
         if(!this.dragging){
             this.closePoint = null;
             this.closeLine = null;
+            this.canvas.style.cursor = 'auto';
         }
         
         this.currentSession.getImages().getCurrentImage().getLines().each(function(line, i){
@@ -274,6 +275,7 @@ Viewer = Backbone.View.extend({
                 if(!this.dragging && euclideanDistance(point.getCoords(), this.mousePoint) <= this.RADIUS*1.75){
                     this.closePoint = point;
                     this.closeLine = line;
+                    this.canvas.style.cursor = 'pointer';
                 }
             }, this);
             
@@ -298,12 +300,12 @@ Viewer = Backbone.View.extend({
             }, this);
         }, this);
         
-        this.context.beginPath();
+        /*this.context.beginPath();
         this.context.arc(this.mousePoint.x/this.scalingFactor, 
                          this.mousePoint.y/this.scalingFactor, 
                          this.RADIUS/this.scalingFactor, 0, 2 * Math.PI, false);
         this.context.fillStyle = 'red';
-        this.context.fill();
+        this.context.fill();*/
     }
 
 });

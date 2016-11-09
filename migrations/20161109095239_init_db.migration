@@ -1,0 +1,191 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+-- phpMyAdmin SQL Dump
+-- version 4.0.10deb1
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: Nov 09, 2016 at 09:55 AM
+-- Server version: 5.5.53-0ubuntu0.14.04.1
+-- PHP Version: 5.5.9-1ubuntu4.20
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
+-- Database: `dcmviewer`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `images`
+--
+
+CREATE TABLE IF NOT EXISTS `images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `set_id` int(11) NOT NULL,
+  `image` longblob NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `set_id` (`set_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `image_sets`
+--
+
+CREATE TABLE IF NOT EXISTS `image_sets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `study` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uni` (`user_id`,`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `lines`
+--
+
+CREATE TABLE IF NOT EXISTS `lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `image_id` int(11) NOT NULL,
+  `session_id` int(11) NOT NULL,
+  `color` varchar(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `image_id` (`image_id`),
+  KEY `session_id` (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `points`
+--
+
+CREATE TABLE IF NOT EXISTS `points` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `line_id` int(11) NOT NULL,
+  `x` float NOT NULL,
+  `y` float NOT NULL,
+  `interpolated` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `line_id` (`line_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sessions`
+--
+
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `set_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `color` varchar(6) NOT NULL DEFAULT 'FF0000',
+  `study_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `set_id` (`set_id`),
+  KEY `user_id` (`user_id`),
+  KEY `fk_study_id` (`study_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `studies`
+--
+
+CREATE TABLE IF NOT EXISTS `studies` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `num_sessions` int(2) NOT NULL DEFAULT '3',
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `password` varchar(256) NOT NULL,
+  `salt` varchar(256) NOT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `acctype` varchar(30) NOT NULL DEFAULT 'Tech',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `images`
+--
+ALTER TABLE `images`
+  ADD CONSTRAINT `images_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`);
+
+--
+-- Constraints for table `image_sets`
+--
+ALTER TABLE `image_sets`
+  ADD CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `lines`
+--
+ALTER TABLE `lines`
+  ADD CONSTRAINT `lines_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`),
+  ADD CONSTRAINT `lines_ibfk_2` FOREIGN KEY (`session_id`) REFERENCES `sessions` (`id`);
+
+--
+-- Constraints for table `points`
+--
+ALTER TABLE `points`
+  ADD CONSTRAINT `points_ibfk_1` FOREIGN KEY (`line_id`) REFERENCES `lines` (`id`);
+
+--
+-- Constraints for table `sessions`
+--
+ALTER TABLE `sessions`
+  ADD CONSTRAINT `fk_study_id` FOREIGN KEY (`study_id`) REFERENCES `studies` (`id`),
+  ADD CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`),
+  ADD CONSTRAINT `sessions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `studies`
+--
+ALTER TABLE `studies`
+  ADD CONSTRAINT `studies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+"""
+
+SQL_DOWN = u"""
+
+"""

@@ -197,6 +197,8 @@ div#sessionContainer {
     vertical-align: top;
     min-width: 300px;
     display: inline-block;
+    border-left: 1px solid #191919;
+    padding-left: 10px;
 }
 
 div#sessions {
@@ -274,13 +276,16 @@ div#fullscreen {
 
 canvas#canvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    cursor: none;
+    top: 1px;
+    left: 1px;
+}
+
+img#slice {
+    border: 1px solid #191919;
 }
 
 .fullscreen canvas#canvas {
-    top: 0;
+    top: 1px;
     bottom: 0;
     left: 0;
     right: 0;
