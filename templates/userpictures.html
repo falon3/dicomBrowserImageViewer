@@ -10,16 +10,16 @@
     <thead>  
         <tr>
             <th width="1%">Preview</th>
-            <th>Image Set Name</th>
+            <th>DICOM name</th>
             <th>Study</th>
             <th>Date Uploaded</th>
-            <th># Images</th>
+            <th># DICOMS in set</th>
         </tr>
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr>
-            <td align="center"><a href="/viewset/{{ value['id'] }}:{{ key }}"><img style="max-width:75px; max-height: 75px;" src="upload/{{ value['mid'] }}" /></a></td>
+            <td align="center"><a href="/viewset/{{ value['id'] }}:{{ key }}"><img style="max-width:75px; max-height: 75px;" src="/upload/{{ value['mid'] }}" /></a></td>
             <td> <a href="/viewset/{{ value['id'] }}:{{ key }}">{{ key }}</a></td>
             <td> {{ value['study'] }} </td>
             <td> {{ value['timestamp'] }}</td>
@@ -29,7 +29,7 @@
     </tbody>
 </table>
 <script type="text/javascript">
-    $("#imageTable").DataTable();
+    $("#imageTable").DataTable({oSearch:{sSearch:"{{setname}}"}});
 </script>
 
 {% endblock %}
