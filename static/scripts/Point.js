@@ -28,8 +28,17 @@ Points = Backbone.Collection.extend({
 
     model: Point,
     
+    set_id: '',
+    
+    study_id: '',
+    
     url: function(){
-        return '/api/points';
+        if(this.study_id == ''){
+            return '/api/sessions/' + this.set_id + '/points';
+        }
+        else{
+            return '/api/sessions/' + this.set_id + '/' + this.study_id + '/points';
+        }
     }
 
 });

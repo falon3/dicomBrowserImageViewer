@@ -16,9 +16,10 @@ Session = Backbone.Model.extend({
     
     defaults: function(){
         return {set_id: '',
-                study_id: '',
+                study_id: 1,
                 name: '',
-                user_id: ''};
+                user_id: '',
+                color: 'FF0000'};
     }
 
 });
@@ -27,8 +28,17 @@ Sessions = Backbone.Collection.extend({
 
     model: Session,
     
+    set_id: '',
+    
+    study_id: '',
+    
     url: function(){
-        return '/api/sessions';
+        if(this.study_id == ''){
+            return '/api/sessions/' + this.set_id;
+        }
+        else{
+            return '/api/sessions/' + this.set_id + '/' + this.study_id;
+        }
     }
 
 });

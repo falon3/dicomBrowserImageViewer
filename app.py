@@ -10,6 +10,9 @@ import settings
 import re
 from utils import *
 from User import *
+from Point import *
+from Line import *
+from StudySession import *
 #import models
 import glob
 import datetime
@@ -239,7 +242,7 @@ def query_set(set_id, name):
                    "AND user_id=%s", (set_id, g.currentUser.userID))
     set_name = cursor.fetchone()[0]
 
-    return render_template('submit.html', title=set_name, first = first, size = size)
+    return render_template('submit.html', title=set_name, set_id = set_id , first = first, size = size)
     
 @app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
@@ -336,6 +339,97 @@ def Logout():
     response = make_response(redirect("/"))
     session.clear()
     g.currentUser = None
+    return response
+    
+# API Routes #
+@app.route("/api/point", methods=['POST'])
+@app.route("/api/point/<int:point_id>", methods=['GET', 'PUT', 'DELETE'])
+@login_required
+def apiPoint(point_id=None):
+    if(request.method == 'POST'):
+        point = Point(line_id = request.json.get('line_id'), 
+                      x = request.json.get('x'), 
+                      y = request.json.get('y'), 
+                      interpolated = 0)
+        point.create()
+    elif(request.method == 'PUT'):
+        point = Point.newFromId(point_id)
+        point.y = request.json.get('y')
+        point.x = request.json.get('x')
+        point.interpolated = 0
+        point.update()
+    elif(request.method == 'DELETE'):
+        point = Point.newFromId(point_id)
+        point.delete()
+    elif(request.method == 'GET'):
+        point = Point.newFromId(point_id)
+    response = make_response(point.toJSON())
+    response.headers['Content-Type'] = 'application/json'
+    return response
+    
+@app.route("/api/line", methods=['POST'])
+@app.route("/api/line/<int:line_id>", methods=['GET', 'DELETE'])
+@login_required
+def apiLine(line_id=None):
+    if(request.method == 'POST'):
+        line = Line(image_id = request.json.get('image_id'), 
+                    session_id = request.json.get('session_id'), 
+                    color = request.json.get('color'))
+        line.create()
+    elif(request.method == 'DELETE'):
+        line = Line.newFromId(line_id)
+        line.delete()
+    elif(request.method == 'GET'):
+        line = Line.newFromId(line_id)
+    response = make_response(line.toJSON())
+    response.headers['Content-Type'] = 'application/json'
+    return response
+    
+@app.route("/api/session", methods=['POST'])
+@app.route("/api/session/<int:session_id>", methods=['GET', 'DELETE'])
+@login_required
+def apiSession(session_id=None):
+    if(request.method == 'POST'):
+        s = StudySession(set_id = request.json.get('set_id'), 
+                         user_id = g.currentUser.userID,
+                         name = request.json.get('name'),
+                         color = request.json.get('color'),
+                         study_id = request.json.get('study_id'))
+        s.create()
+    elif(request.method == 'DELETE'):
+        s = StudySession.newFromId(session_id)
+        s.delete()
+    elif(request.method == 'GET'):
+        s = StudySession.newFromId(session_id)
+    response = make_response(s.toJSON())
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+@app.route("/api/sessions/<int:set_id>/points", methods=['GET'])
+@app.route("/api/sessions/<int:set_id>/<int:study_id>/points", methods=['GET'])
+@login_required
+def apiPoints(set_id="%",study_id="%"):
+    points = Point.getAll(set_id, study_id)
+    response = make_response(json_encode_list(points))
+    response.headers['Content-Type'] = 'application/json'
+    return response
+    
+@app.route("/api/sessions/<int:set_id>/lines", methods=['GET'])
+@app.route("/api/sessions/<int:set_id>/<int:study_id>/lines", methods=['GET'])
+@login_required
+def apiLines(set_id="%",study_id="%"):
+    lines = Line.getAll(set_id, study_id)
+    response = make_response(json_encode_list(lines))
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+@app.route("/api/sessions/<int:set_id>", methods=['GET'])
+@app.route("/api/sessions/<int:set_id>/<int:study_id>", methods=['GET'])
+@login_required
+def apiSessions(set_id="%",study_id="%"):
+    s = StudySession.getAll(set_id, study_id)
+    response = make_response(json_encode_list(s))
+    response.headers['Content-Type'] = 'application/json'
     return response
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ Line = Backbone.Model.extend({
         id: null,
         session_id: null,
         image_id: null,
-        color: '#FF0000'
+        color: 'FF0000'
     }
 
 });
@@ -26,6 +26,10 @@ Lines = Backbone.Collection.extend({
             this.setCurrentLine(this.last());
         }, this);
     },
+    
+    set_id: '',
+    
+    study_id: '',
 
     model: Line,
     
@@ -40,7 +44,12 @@ Lines = Backbone.Collection.extend({
     },
     
     url: function(){
-        return '/api/lines';
+        if(this.study_id == ''){
+            return '/api/sessions/' + this.set_id + '/lines';
+        }
+        else{
+            return '/api/sessions/' + this.set_id + '/' + this.study_id + '/lines';
+        }
     }
 
 });
