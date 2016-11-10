@@ -58,8 +58,8 @@ Viewer = Backbone.View.extend({
             this.sessions.each(function(session){
                 var images = new Images();
                 _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
-                    var image = new Image({id: i+1, src: $(img).attr('src')});
-                    image.lines.reset(lines.where({session_id: session.get('id'), image_id: image.get('id')}))
+                    var image = new Image({id: parseInt($(img).attr('data-id')), src: $(img).attr('src')});
+                    image.lines.reset(lines.where({session_id: session.get('id'), image_id: image.get('id')}));
                     images.add(image);
                 }, this));
                 session.setImages(images);
@@ -78,7 +78,7 @@ Viewer = Backbone.View.extend({
         var session = new Session({set_id: this.set_id, name: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
         var images = new Images();
         _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
-            var image = new Image({id: i+1, src: $(img).attr('src')});
+            var image = new Image({id: parseInt($(img).attr('data-id')), src: $(img).attr('src')});
             images.add(image);
         }, this));
         session.setImages(images);

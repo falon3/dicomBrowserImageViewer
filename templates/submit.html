@@ -27,7 +27,7 @@
         </div>
         <div id="preCachedImages">
             {% for i in range(first, first + size) %}
-                <img src="/upload/{{ i }}" />
+                <img src="/upload/{{ i }}" data-id="{{ i }}" />
             {% endfor %}
         </div>
     </div>
