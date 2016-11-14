@@ -32,7 +32,6 @@ class Line:
                 lines.append(Line(id, image_id, session_id, color))
             return lines
         except Exception as e:
-            print e
             return []
 
     def __init__(self, id=None, image_id=None, session_id=None, color=None):
