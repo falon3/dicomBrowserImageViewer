@@ -236,7 +236,7 @@ Viewer = Backbone.View.extend({
                 }
                 else{
                     point.set('line_id', this.currentSession.getImages().getCurrentImage().getCurrentLine().get('id'));
-                    if(e.button == 0 && !_.isEmpty(point.get('line_id'))){
+                    if(e.button == 0 && !_.isNull(point.get('line_id'))){
                         point.save();
                     }
                 }
@@ -262,7 +262,7 @@ Viewer = Backbone.View.extend({
     mouseUp: function(e){
         if(this.closePoint != null && 
            !this.closePoint.isNew() &&
-           !_.isEmpty(this.closePoint.get('line_id'))){
+           !_.isNull(this.closePoint.get('line_id'))){
             this.closePoint.save();
         }
         this.dragging = false;

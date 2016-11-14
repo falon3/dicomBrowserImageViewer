@@ -19,6 +19,7 @@ Point = Backbone.Model.extend({
     defaults: {
         x: 0,
         y: 0,
+        line_id: null,
         interpolated: false
     }
 
