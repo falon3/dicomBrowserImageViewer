@@ -1,4 +1,5 @@
 from flask import g
+from Study import *
 import json
 
 class ImageSet:
@@ -22,6 +23,20 @@ class ImageSet:
         self.name = name
         self.created_no = created_on
         self.study = study
+        
+    def getStudy(self):
+        return Study.newFromName(self.study)
+        
+    def getImages(self):
+        cursor = g.db.cursor()
+        cursor.execute("SELECT i.id "
+                       "FROM images i, image_sets s "
+                       "WHERE i.set_id=%s "
+                       "AND i.set_id = s.id "
+                       "AND s.user_id=%s", (self.id, g.currentUser.userID))
+        data = cursor.fetchall()
+        imgs = [img[0] for img in data]
+        return imgs
         
     def toJSON(self):
         return json.dumps(self.__dict__)

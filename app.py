@@ -246,24 +246,11 @@ def upload():
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
 def query_set(set_id, name):
-
-    # get db connection cursor
-    cursor = g.db.cursor()
-    cursor.execute("SELECT i.id "
-                   "FROM images i, image_sets s "
-                   "WHERE i.set_id=%s "
-                   "AND i.set_id = s.id "
-                   "AND s.user_id=%s", (set_id, g.currentUser.userID))    
-    img_list = cursor.fetchall()
-    first = img_list[0][0]
-    size = len(img_list)
-    cursor.execute("SELECT name "
-                   "FROM image_sets "
-                   "WHERE id=%s "
-                   "AND user_id=%s", (set_id, g.currentUser.userID))
-    set_name = cursor.fetchone()[0]
-
-    return render_template('submit.html', title=set_name, set_id = set_id , first = first, size = size)
+    imageset = ImageSet.newFromId(set_id)
+    imgs = imageset.getImages()
+    first = imgs[0]
+    size = len(imgs)
+    return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
     
 @app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
@@ -279,7 +266,6 @@ def get_image(img_id):
                        "AND s.user_id=%s", (img_id, g.currentUser.userID))        
         img = cursor.fetchone()[0]
         return send_file(BytesIO(img), mimetype='image/jpg')
-
     except:
         filename = 'images/error.gif'
         return send_file(filename)
@@ -414,12 +400,15 @@ def apiSession(session_id=None):
         imageset = ImageSet.newFromId(request.json.get('set_id'))
         study = Study.newFromName(imageset.study)
         sessions = StudySession.getAll(request.json.get('set_id'), request.json.get('study_id'))
-        s = StudySession(set_id = request.json.get('set_id'), 
-                         user_id = g.currentUser.userID,
-                         name = str(g.currentUser.name) + "." + str(imageset.name) + "." + str(study.name) + "-" + str(len(sessions)),
-                         color = request.json.get('color'),
-                         study_id = request.json.get('study_id'))
-        s.create()
+        if(len(sessions) < study.num_sessions):
+            s = StudySession(set_id = request.json.get('set_id'), 
+                             user_id = g.currentUser.userID,
+                             name = str(g.currentUser.name) + "." + str(imageset.name) + "." + str(study.name) + "-" + str(len(sessions)),
+                             color = request.json.get('color'),
+                             study_id = request.json.get('study_id'))
+            s.create()
+        else:
+            s = StudySession()
     elif(request.method == 'DELETE'):
         s = StudySession.newFromId(session_id)
         s.delete()

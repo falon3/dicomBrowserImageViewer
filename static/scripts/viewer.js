@@ -4,6 +4,7 @@ Viewer = Backbone.View.extend({
     SEGMENTS: 18,
     
     set_id: '',
+    num_sessions: '',
     sessions: new Sessions(),
     currentSession: null,
     mousePoint: {x: -1000, y: -1000},
@@ -20,6 +21,7 @@ Viewer = Backbone.View.extend({
 
     initialize: function(){
         this.set_id = this.$el.attr("data-set_id");
+        this.num_sessions = this.$el.attr("data-num_sessions");
         this.slice = this.$("#slice");
         this.canvas = this.$("canvas")[0];
         this.context = this.canvas.getContext('2d');
@@ -76,21 +78,23 @@ Viewer = Backbone.View.extend({
     
     // Adding a new session
     addSession: function(){
-        var session = new Session({set_id: this.set_id, name: 'Creating...'});
-        var images = new Images();
-        _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
-            var image = new Image({id: parseInt($(img).attr('data-id')), src: $(img).attr('src')});
-            images.add(image);
-        }, this));
-        session.setImages(images);
-        session.save(null, {
-            success: $.proxy(function(){
-                this.renderUI();
-                this.render();
-            }, this)
-        });
-        this.sessions.add(session);
-        this.currentSession = this.sessions.at(this.sessions.length-1);
+        if(this.sessions.length < this.num_sessions){
+            var session = new Session({set_id: this.set_id, name: 'Creating...'});
+            var images = new Images();
+            _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
+                var image = new Image({id: parseInt($(img).attr('data-id')), src: $(img).attr('src')});
+                images.add(image);
+            }, this));
+            session.setImages(images);
+            session.save(null, {
+                success: $.proxy(function(){
+                    this.renderUI();
+                    this.render();
+                }, this)
+            });
+            this.sessions.add(session);
+            this.currentSession = this.sessions.at(this.sessions.length-1);
+        }
         this.renderUI();
         this.render();
     },
@@ -303,6 +307,14 @@ Viewer = Backbone.View.extend({
         this.$("#slider").val(this.currentSession.getImages().currentId);
         this.$("#currentImage").text(this.currentSession.getImages().currentId+1);
         this.$("#maxImage").text(this.currentSession.getImages().length);
+        
+        // Updating Add Session button
+        if(this.sessions.length >= this.num_sessions){
+            this.$("#addSession").prop('disabled', true);
+        }
+        else{
+            this.$("#addSession").prop('disabled', false);
+        }
         
         // Updating button appearance
         if(this.currentSession.getImages().isFirst()){
