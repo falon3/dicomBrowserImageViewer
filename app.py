@@ -399,13 +399,13 @@ def apiSession(session_id=None):
     if(request.method == 'POST'):
         imageset = ImageSet.newFromId(request.json.get('set_id'))
         study = Study.newFromName(imageset.study)
-        sessions = StudySession.getAll(request.json.get('set_id'), request.json.get('study_id'))
+        sessions = StudySession.getAll(imageset.id, study.id)
         if(len(sessions) < study.num_sessions):
-            s = StudySession(set_id = request.json.get('set_id'), 
+            s = StudySession(set_id = imageset.id, 
                              user_id = g.currentUser.userID,
                              name = str(g.currentUser.name) + "." + str(imageset.name) + "." + str(study.name) + "-" + str(len(sessions)),
                              color = request.json.get('color'),
-                             study_id = request.json.get('study_id'))
+                             study_id = study.id)
             s.create()
         else:
             s = StudySession()
