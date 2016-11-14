@@ -1,5 +1,6 @@
 from flask import g
 from Study import *
+from Image import *
 import json
 
 class ImageSet:
@@ -28,6 +29,7 @@ class ImageSet:
         return Study.newFromName(self.study)
         
     def getImages(self):
+        # Should be rafactored into a getAll function in Image.py
         cursor = g.db.cursor()
         cursor.execute("SELECT i.id "
                        "FROM images i, image_sets s "
@@ -35,7 +37,9 @@ class ImageSet:
                        "AND i.set_id = s.id "
                        "AND s.user_id=%s", (self.id, g.currentUser.userID))
         data = cursor.fetchall()
-        imgs = [img[0] for img in data]
+        imgs = list()
+        for img in data:
+            imgs.append(Image.newFromId(img[0]))
         return imgs
         
     def toJSON(self):
@@ -44,8 +48,8 @@ class ImageSet:
     def create(self):
         cursor = g.db.cursor()
         cursor.execute(                                                      
-            "INSERT INTO image_sets (user_id, name, created_on, study) "
-            "VALUES (%s, %s, %s, %s)", (self.user_id, self.name, self.created_on, self.study)
+            "INSERT INTO image_sets (user_id, name, study) "
+            "VALUES (%s, %s, %s)", (self.user_id, self.name, self.study)
         )
         self.id = cursor.lastrowid
         
@@ -55,9 +59,8 @@ class ImageSet:
             "UPDATE image_sets SET "
             "user_id = %s, "
             "name = %s, "
-            "created_on = %s, "
             "study = %s, "
-            "WHERE id = %s", (self.user_id, self.name, self.created_on, self.study, self.id)
+            "WHERE id = %s", (self.user_id, self.name, self.study, self.id)
         )
         
     def delete(self):
