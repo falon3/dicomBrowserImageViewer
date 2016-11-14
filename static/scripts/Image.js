@@ -30,6 +30,10 @@ Images = Backbone.Collection.extend({
 
     currentId: 0,
 
+    setCurrentId: function(currentId){
+        this.currentId = Math.min(Math.max(currentId, 0), this.length-1);
+    },
+
     // Returns the current image in the viewer
     getCurrentImage: function(){
         return this.at(this.currentId);

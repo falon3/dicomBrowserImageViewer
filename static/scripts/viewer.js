@@ -24,6 +24,7 @@ Viewer = Backbone.View.extend({
         this.canvas = this.$("canvas")[0];
         this.context = this.canvas.getContext('2d');
         this.$("#curved").prop("checked", true);
+        this.$("#slider").val(0);
         
         this.render = _.debounce(this.render, 1);
         this.renderUI = _.debounce(this.renderUI, 1);
@@ -123,6 +124,13 @@ Viewer = Backbone.View.extend({
     // Display the next image
     next: function(e){
         this.currentSession.getImages().next();
+        this.renderUI();
+        this.render();
+    },
+    
+    setImage: function(e){
+        var val = this.$("#slider").val();
+        this.currentSession.getImages().setCurrentId(val);
         this.renderUI();
         this.render();
     },
@@ -273,6 +281,7 @@ Viewer = Backbone.View.extend({
     events: {
         "click #previous": "previous",
         "click #next": "next",
+        "input #slider": "setImage",
         "change #curved": "changeSegments",
         "click #fullscreen a": "toggleFullScreen",
         "click #sessions > div": "clickSession",
@@ -286,6 +295,7 @@ Viewer = Backbone.View.extend({
     renderUI: function(){
         // Changing the image
         this.slice.attr("src", this.currentSession.getImages().getCurrentImage().get('src'));
+        this.$("#slider").val(this.currentSession.getImages().currentId);
         this.$("#currentImage").text(this.currentSession.getImages().currentId+1);
         this.$("#maxImage").text(this.currentSession.getImages().length);
         
