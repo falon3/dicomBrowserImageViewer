@@ -76,14 +76,19 @@ Viewer = Backbone.View.extend({
     
     // Adding a new session
     addSession: function(){
-        var session = new Session({set_id: this.set_id, name: 'user.date.DICOMname.StudyName-' + (this.sessions.length+1)});
+        var session = new Session({set_id: this.set_id, name: 'Creating...'});
         var images = new Images();
         _.each(this.$("#preCachedImages img"), $.proxy(function(img, i){
             var image = new Image({id: parseInt($(img).attr('data-id')), src: $(img).attr('src')});
             images.add(image);
         }, this));
         session.setImages(images);
-        session.save();
+        session.save(null, {
+            success: $.proxy(function(){
+                this.renderUI();
+                this.render();
+            }, this)
+        });
         this.sessions.add(session);
         this.currentSession = this.sessions.at(this.sessions.length-1);
         this.renderUI();

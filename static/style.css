@@ -196,6 +196,7 @@ div#middleViewer {
 div#sessionContainer {
     vertical-align: top;
     min-width: 300px;
+    max-width: 300px;
     display: inline-block;
     border-left: 1px solid #191919;
     padding-left: 10px;
