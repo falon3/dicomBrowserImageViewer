@@ -132,7 +132,6 @@ def create_study():
             
     return display_studies()
 
-
 @app.route('/studies/', methods=['GET'])
 @login_required
 def display_studies(error=''):
@@ -144,7 +143,23 @@ def display_studies(error=''):
     data = cursor.fetchall()
     study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4] } for study in data}
 
-    return render_template('studies.html', title='Studies', error=error, result = study_dict)    
+    return render_template('studies.html', title='Studies', error=error, result = study_dict)  
+
+@app.route('/studies/<name>', methods=['GET'])
+@login_required
+def expand_study(name):
+     cursor = g.db.cursor()
+     cursor.execute("SELECT i.name, i.id, i.created_on, COUNT(*) "
+                    "FROM image_sets i, studies s "
+                    "WHERE i.study = %s "
+                    "GROUP BY i.name", (name))
+     data = cursor.fetchall()
+     img_dict = {str(dcm[0]): {'id':dcm[1], 'timestamp': str(dcm[2]) } for dcm in data}
+     response = make_response(json.dumps(img_dict))
+     response.headers['Content-Type'] = 'application/json'
+     print(response)
+     return response
+    
 
 @app.route('/upload/', methods=['GET'])
 @login_required
