@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/studyExpand.js') }}"></script>
 {% if g.currentUser.acctype == 'Researcher' %}   
     <button onclick="location.href = '/studies/create/';" id="studybutton" class="float-left submit-button" >Create New Study</button>
 {% endif %}
@@ -11,18 +12,21 @@
         <tr>
             <th>Study Name</th>
             <th>Creator</th>
-            <th>Sessions/Participant</th>
-            <th>Date Created</th>
+            <th width="130">max # sessions</th>
+            <th width="250">Date Created</th>
         </tr>
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr>
-            <td> {{ key }} </td>
-            <td> {{ value['creator'] }} </td>
-            <td align="right"> {{ value['num_sessions'] }} </td>
-            <td> {{ value['created_on'] }}</td>
+            <td > <a class="LoadStudyDicoms" style="font-size:23px; color:#ffff; text-decoration:none;" href="/studies/{{ key }}">
+                &#8853;</a> {{ key }} </td>
+            <td align="center"> {{ value['creator'] }} </td>
+            <td align="center"> {{ value['num_sessions'] }} </td>
+            <td align="center"> {{ value['created_on'] }}</td>
         </tr>
+        <tr class="hiddenRows"> HIDDEN
+            </tr>
         {% endfor %}
     </tbody>
 </table>
