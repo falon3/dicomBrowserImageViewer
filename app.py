@@ -149,11 +149,8 @@ def display_studies(error=''):
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):
-    cursor = g.db.cursor()
-    cursor.execute("SELECT s.name FROM studies s GROUP BY s.id")
-    data = cursor.fetchall()
-    studies = [study[0] for study in data]
-    return render_template('upload.html', title= "Upload Dicom", num_studies = len(studies), studies = studies, error=error)
+    studies = Study.getAll()
+    return render_template('upload.html', title= "Upload Dicom", studies = studies, error=error)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])

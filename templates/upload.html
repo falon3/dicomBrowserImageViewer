@@ -6,8 +6,8 @@
         <label for="filename"> Please enter a name for the set of images: </label>
         <select name="study"  id="study"> Select study
             <option selected="selected" disabled="disabled">Select a Study</option>
-            {% for i in range(num_studies) %}
-            <option value="{{ studies[i] }}">{{ studies[i] }}</option>
+            {% for study in studies %}
+            <option value="{{ study.name }}">{{ study.name }}</option>
             {% endfor %}
         </select>
         <input type="text" name= "filename" id="filename" required /><br/>

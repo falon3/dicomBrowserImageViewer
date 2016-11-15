@@ -28,6 +28,20 @@ class Study:
             return Study(id, name, created_on, num_sessions, user_id)
         except:
             return Study()
+            
+    @staticmethod
+    def getAll():
+        try:
+            cursor = g.db.cursor()
+            cursor.execute("SELECT id, name, created_on, num_sessions, user_id FROM studies")
+            data = cursor.fetchall()
+            studies = []
+            for row in data:
+                (id, name, created_on, num_sessions, user_id) = row
+                studies.append(Study(id, name, created_on, num_sessions, user_id))
+            return studies
+        except:
+            return []
 
     def __init__(self, id=None, name=None, created_on=None, num_sessions=None, user_id=None):
         self.id = id
