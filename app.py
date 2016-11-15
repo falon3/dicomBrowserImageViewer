@@ -163,7 +163,7 @@ def display_studies(error=''):
 @login_required
 def expand_study(name):
      cursor = g.db.cursor()
-     cursor.execute("SELECT i.name, i.id, i.created_on, COUNT(*) "
+     cursor.execute("SELECT i.name, i.id, i.created_on "
                     "FROM image_sets i, studies s "
                     "WHERE i.study = %s "
                     "GROUP BY i.name", (name))
@@ -259,6 +259,7 @@ def upload():
 def query_set(set_id, name):
     imageset = ImageSet.newFromId(set_id)
     imgs = imageset.getImages()
+    print(imgs)
     first = imgs[0].id
     size = len(imgs)
     return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)

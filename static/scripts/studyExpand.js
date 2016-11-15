@@ -7,9 +7,23 @@ $(document).ready(function(){
                     var last=null;
         
                     api.column(0, {page:'current'} ).data().each( function ( group, i ) {
-                        if (expansion[$(rows).eq(i).attr("id")]){
+                        var expand_rows = "";
+                        study_details = expansion[$(rows).eq(i).attr("id")]
+                        console.log(study_details);
+                        if (study_details != undefined){
+                            for (key in study_details){
+                                expand_rows += "<tr class='group'><td>preview</td>"
+                                expand_rows += "<td> <a style='color:#8888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>" + key + "</a></td>";
+                                var date = study_details[key].timestamp;
+                                expand_rows+= "<td>"+date+"</td></tr>"
+                            }
+
                             $(rows).eq( i ).after(
-                            '<tr class="group"><td colspan="4">'+expansion[$(rows).eq(i).attr("id")]+'</td></tr>'
+                            '<tr class="group">'+
+                                    '<th>Preview</th>'+
+                                    '<th>DICOM name</th>'+
+                                    '<th>Date Uploaded</th></tr>'+
+                                    expand_rows
                             );
                         }
                     });
@@ -31,10 +45,7 @@ $(document).ready(function(){
         }
         
         $.get(url, $.proxy(function( data, textStatus ) {
-            console.log(textStatus);
-
-            if (textStatus === 'success') {
-                console.log(data);
+             if (textStatus === 'success') {
                 expansion[$(this).parents("tr").attr("id")] = data;
                 table.draw();
             }
