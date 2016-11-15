@@ -83,13 +83,27 @@ def index():
     if not setname:
         setname = ''
 
+    user_id = "LIKE '%'"
+    
     cursor = g.db.cursor()
     # get all image set info to be displayed in table
-    cursor.execute("SELECT s.name, s.id, s.created_on, MIN(i.id) as start, s.study, COUNT(*) "
-                   "FROM image_sets s, images i "
-                   "WHERE user_id = %s "
-                   "AND i.set_id = s.id "
-                   "GROUP BY s.id", (g.currentUser.userID))
+    # Techs only see what they uploaded, 
+    # participants only see what belongs to a study
+    # researchers see all
+    qbuilder = "SELECT s.name, s.id, s.created_on, MIN(i.id) as start, s.study, COUNT(*) FROM image_sets s, images i WHERE i.set_id = s.id  "
+
+    param = None
+    if g.currentUser.acctype == 'Tech':
+        qbuilder += "AND user_id = %s "
+        param = g.currentUser.userID
+    elif g.currentUser.acctype == 'Participant':
+        qbuilder += "AND s.study IS NOT NULL "
+    qbuilder+= "GROUP BY s.id"
+
+    if param:
+        cursor.execute(qbuilder, (param))
+    else:
+        cursor.execute(qbuilder)
     data = cursor.fetchall()
     img_dict = {str(set[0]): {'id':set[1], 'timestamp': set[2], 'start': set[3], 'mid': int(set[3] + set[5]/2), 'study': set[4] } for set in data}
 
