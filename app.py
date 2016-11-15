@@ -13,6 +13,8 @@ from User import *
 from Point import *
 from Line import *
 from StudySession import *
+from Study import *
+from ImageSet import *
 #import models
 import glob
 import datetime
@@ -118,14 +120,10 @@ def create_study():
     name = re.sub('[^A-Za-z0-9]+', '', name)
     sessions = request.form.get('sessions')
 
-    # get db connection cursor
-    cursor = g.db.cursor()
     # create UNIQUE image set for this user and setname in database
+    study = Study(name = name, num_sessions = sessions, user_id = g.currentUser.userID)
     try:
-        cursor.execute(
-            "insert into studies (id, name, created_on, num_sessions, user_id) "
-            "VALUES (NULL, %s, NULL, %s, %s)", (name, sessions, g.currentUser.userID)             
-        )
+        study.create()
     except Exception as e:
         err = e[1]
         if "Duplicate" in err:
@@ -214,14 +212,10 @@ def upload():
         if convert != 0:
             return load_upload_page(error="Unable to convert image, needs a DICOM (.dcm) format")
     
-        # get db connection cursor
-        cursor = g.db.cursor()
         # create UNIQUE image set for this user and setname in database
+        imageset = ImageSet(user_id = g.currentUser.userID, name = fullname, study = study)
         try:
-            cursor.execute(
-                "INSERT INTO image_sets (user_id, name, study)"                      
-                "VALUES (%s, %s, %s)", (g.currentUser.userID, fullname, study)             
-            )
+            imageset.create()
         except Exception as e:
             err = e[1]
             if "Duplicate" in err:
@@ -230,11 +224,7 @@ def upload():
             for img in glob.glob(tempsaved+fullname+'*'):
                 remove(img)
             return load_upload_page(error=err)
-            
-        # get current image_set id        
-        cursor.execute("SELECT id FROM image_sets WHERE name='" + fullname + "'") 
-        current_setid = cursor.fetchone()[0]  
-    
+
         # save all in set as blobs in images table in database in correct order
         for index in range(set_size):
             if(set_size > 1):
@@ -244,10 +234,8 @@ def upload():
             picture = path.abspath(picture)
             contents = file_get_contents(picture)
 
-            cursor.execute(
-                "INSERT INTO images (id, set_id, image)"
-                "VALUES (NULL, %s, %s)", (current_setid, contents) 
-            )
+            image = Image(set_id = imageset.id, image = contents)
+            image.create()
             if set_size > 2:
                 remove(picture) # delete temp files
         
@@ -259,40 +247,19 @@ def upload():
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
 def query_set(set_id, name):
-
-    # get db connection cursor
-    cursor = g.db.cursor()
-    cursor.execute("SELECT i.id "
-                   "FROM images i, image_sets s "
-                   "WHERE i.set_id=%s "
-                   "AND i.set_id = s.id "
-                   "AND s.user_id=%s", (set_id, g.currentUser.userID))    
-    img_list = cursor.fetchall()
-    first = img_list[0][0]
-    size = len(img_list)
-    cursor.execute("SELECT name "
-                   "FROM image_sets "
-                   "WHERE id=%s "
-                   "AND user_id=%s", (set_id, g.currentUser.userID))
-    set_name = cursor.fetchone()[0]
-
-    return render_template('submit.html', title=set_name, set_id = set_id , first = first, size = size)
+    imageset = ImageSet.newFromId(set_id)
+    imgs = imageset.getImages()
+    first = imgs[0].id
+    size = len(imgs)
+    return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
     
 @app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
 def get_image(img_id):
-    # get db connection cursor
-    cursor = g.db.cursor()   
     try:
         #get image set from database
-        cursor.execute("SELECT i.image "
-                       "FROM images i, image_sets s "
-                       "WHERE i.id=%s "
-                       "AND i.set_id = s.id "
-                       "AND s.user_id=%s", (img_id, g.currentUser.userID))        
-        img = cursor.fetchone()[0]
-        return send_file(BytesIO(img), mimetype='image/jpg')
-
+        img = Image.newFromId(img_id, includeImage=True)
+        return send_file(BytesIO(img.image), mimetype='image/jpg')
     except:
         filename = 'images/error.gif'
         return send_file(filename)
@@ -424,12 +391,18 @@ def apiLine(line_id=None):
 @login_required
 def apiSession(session_id=None):
     if(request.method == 'POST'):
-        s = StudySession(set_id = request.json.get('set_id'), 
-                         user_id = g.currentUser.userID,
-                         name = request.json.get('name'),
-                         color = request.json.get('color'),
-                         study_id = request.json.get('study_id'))
-        s.create()
+        imageset = ImageSet.newFromId(request.json.get('set_id'))
+        study = Study.newFromName(imageset.study)
+        sessions = StudySession.getAll(imageset.id, study.id)
+        if(len(sessions) < study.num_sessions):
+            s = StudySession(set_id = imageset.id, 
+                             user_id = g.currentUser.userID,
+                             name = str(g.currentUser.name) + "." + str(imageset.name) + "." + str(study.name) + "-" + str(len(sessions)),
+                             color = request.json.get('color'),
+                             study_id = study.id)
+            s.create()
+        else:
+            s = StudySession()
     elif(request.method == 'DELETE'):
         s = StudySession.newFromId(session_id)
         s.delete()

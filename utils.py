@@ -7,6 +7,5 @@ def file_get_contents(filename):
 def json_encode_list(l):
     newList = []
     for obj in l:
-        print obj
         newList.append(obj.__dict__)
     return json.dumps(newList)

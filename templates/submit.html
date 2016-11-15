@@ -3,7 +3,7 @@
 
 <button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
 <br><br>
-    <div id="viewer" data-set_id="{{ set_id }}">
+    <div id="viewer" data-set_id="{{ imageset.id }}" data-num_sessions="{{ imageset.getStudy().num_sessions }}">
         <div id="viewerContainer">
             <div id="topViewer">
                 Show Curved Lines: <input id="curved" type="checkbox" checked />
@@ -23,6 +23,9 @@
                 <button id="previous">&lt;</button>
                 <span id="currentImage"></span> / <span id="maxImage"></span>
                 <button id="next">&gt;</button>
+                <div id="sliderContainer">
+                    <input id="slider" type="range" min="0" max="{{size - 1}}" value="0" />
+                </div>
             </div>
         </div>
         <div id="preCachedImages">

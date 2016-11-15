@@ -16,7 +16,7 @@ Session = Backbone.Model.extend({
     
     defaults: function(){
         return {set_id: '',
-                study_id: 1,
+                study_id: '',
                 name: '',
                 user_id: '',
                 color: 'FF0000'};

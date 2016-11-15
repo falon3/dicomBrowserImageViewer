@@ -6,10 +6,13 @@ class StudySession:
     @staticmethod
     def newFromId(id):
         try:
+            user_id = "%"
+            if (g.currentUser.acctype != 'Researcher'):
+                user_id = g.currentUser.userID
             cursor = g.db.cursor()
             cursor.execute(                                                      
                 "SELECT id, set_id, user_id, name, color, study_id FROM sessions "
-                "WHERE id = %s", (id)
+                "WHERE id = %s AND user_id LIKE %s", (id, user_id)
             )
             (id, set_id, user_id, name, color, study_id) = cursor.fetchone()
             return StudySession(id, set_id, user_id, name, color, study_id)
@@ -17,12 +20,14 @@ class StudySession:
             return StudySession()
 
     @staticmethod
-    def getAll(set_id="%", study_id="%"):
+    def getAll(set_id="%", study_id="%", user_id="%"):
         try:
+            if (g.currentUser.acctype != 'Researcher'):
+                user_id = g.currentUser.userID
             cursor = g.db.cursor()
             cursor.execute(                                                      
                 "SELECT id, set_id, user_id, name, color, study_id FROM sessions "
-                "WHERE set_id LIKE %s AND study_id LIKE %s", (set_id, study_id)
+                "WHERE set_id LIKE %s AND study_id LIKE %s AND user_id LIKE %s", (set_id, study_id, user_id)
             )
             data = cursor.fetchall()
             sessions = []

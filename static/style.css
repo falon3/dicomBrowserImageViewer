@@ -196,6 +196,7 @@ div#middleViewer {
 div#sessionContainer {
     vertical-align: top;
     min-width: 300px;
+    max-width: 300px;
     display: inline-block;
     border-left: 1px solid #191919;
     padding-left: 10px;
@@ -229,9 +230,24 @@ div#sessions > div:hover {
 div#bottomViewer {
     min-width: 500px;
     height: 44px;
-    line-height: 44px;
     padding: 15px;
     border-top: 1px solid #191919;
+    position:relative;
+}
+
+div#sliderContainer {
+    position: absolute;
+    bottom: 15px;
+    left: 100px;
+    right: 100px;
+}
+
+input#slider {
+    width: 100%;
+    border: none;
+    background: black;
+    margin: 0;
+    padding: 0;
 }
 
 .fullscreen div#topViewer {
