@@ -171,7 +171,6 @@ def expand_study(name):
      img_dict = {str(dcm[0]): {'id':dcm[1], 'timestamp': str(dcm[2]) } for dcm in data}
      response = make_response(json.dumps(img_dict))
      response.headers['Content-Type'] = 'application/json'
-     print(response)
      return response
     
 

@@ -1,27 +1,48 @@
 $(document).ready(function(){
-
-    $(".LoadStudyDicoms").on("click", function() {
-        alert("clicked!")
+    var expansion = {};
+    var table = $("#studyTable").DataTable({
+    "drawCallback": function ( settings ) {
+                    var api = this.api();
+                    var rows = api.rows( {page:'current'} ).nodes();
+                    var last=null;
+        
+                    api.column(0, {page:'current'} ).data().each( function ( group, i ) {
+                        if (expansion[$(rows).eq(i).attr("id")]){
+                            $(rows).eq( i ).after(
+                            '<tr class="group"><td colspan="4">'+expansion[$(rows).eq(i).attr("id")]+'</td></tr>'
+                            );
+                        }
+                    });
+    }
+    });
+                
+    // on click expand or collapse the table row
+    $(".LoadStudyDicoms").on("click", function(event) {
         event.preventDefault();
         var url = $(this).attr("href");
-        var hiddenRows = $(".hiddenRows");
+        if ($(this).html() == "⊖"){
+            $(this).html("&#8853;");
+            expansion[$(this).parents("tr").attr("id")] = undefined;
+            table.draw();
+            return     
+        }
+        else{
+            $(this).html("&#8854;");
+        }
         
-        $.ajax({
-            url: url,
-            type : 'get',
-            complete : function( qXHR, textStatus ) {
-                // attach error case
+        $.get(url, $.proxy(function( data, textStatus ) {
+            console.log(textStatus);
 
-                if (textStatus === 'success') {
-                    var data = qXHR.responseText
-                    hiddenRows.hide();
-                    //hiddenRows.append(data);
-                    //hiddenRows.fadeIn();
-                }
+            if (textStatus === 'success') {
+                console.log(data);
+                expansion[$(this).parents("tr").attr("id")] = data;
+                table.draw();
             }
-        });
-    }
-
-    filename.onkeyup = validateFilename;
-    submit.onkeyup = validateFilename;
+            
+        },this)
+             ).fail($.proxy(function() {
+                 expansion[$(this).parents("tr").attr("id")] = "table error";
+                 table.draw();
+        },this));
+    })
 })

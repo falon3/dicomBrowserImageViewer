@@ -18,20 +18,14 @@
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
-        <tr>
-            <td > <a class="LoadStudyDicoms" style="font-size:23px; color:#ffff; text-decoration:none;" href="/studies/{{ key }}">
-                &#8853;</a> {{ key }} </td>
+        <tr id="{{key}}">
+            <td > <a class="LoadStudyDicoms" style="font-size:23px; color:#ffff; text-decoration:none;" href="/studies/{{ key }}">&#8853;</a> {{ key }} </td>
             <td align="center"> {{ value['creator'] }} </td>
             <td align="center"> {{ value['num_sessions'] }} </td>
             <td align="center"> {{ value['created_on'] }}</td>
         </tr>
-        <!-- - ><tr class="hiddenRows"> HIDDEN
-        </tr> -->
         {% endfor %}
     </tbody>
 </table>
-<script type="text/javascript">
- $("#studyTable").DataTable();
-</script>
 
 {% endblock %}
