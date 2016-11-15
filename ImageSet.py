@@ -34,8 +34,7 @@ class ImageSet:
         cursor.execute("SELECT i.id "
                        "FROM images i, image_sets s "
                        "WHERE i.set_id=%s "
-                       "AND i.set_id = s.id "
-                       "AND s.user_id=%s", (self.id, g.currentUser.userID))
+                       "AND i.set_id = s.id", (self.id))
         data = cursor.fetchall()
         imgs = list()
         for img in data:
