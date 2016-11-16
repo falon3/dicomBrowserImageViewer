@@ -2,6 +2,7 @@
 from flask import Flask, session, abort, send_file, render_template, request, url_for, redirect, make_response, g
 from flaskext.mysql import MySQL
 from flask_session import Session
+from flask_compress import Compress
 from functools import wraps
 import hashlib, uuid
 import subprocess
@@ -30,6 +31,7 @@ app.config['MYSQL_DATABASE_USER'] = settings.database['user']
 app.config['MYSQL_DATABASE_PASSWORD'] = settings.database['passwd']
 app.config['MYSQL_DATABASE_DB'] = settings.database['db']
 app.config['MYSQL_DATABASE_HOST'] = settings.database['host']
+
 mysql.init_app(app)
 # Session Settings
 SESSION_TYPE = 'filesystem'
@@ -37,9 +39,7 @@ SESSION_FILE_DIR = '/tmp/'
 app.config.from_object(__name__)
 app.permanent_session_lifetime = datetime.timedelta(hours=1)
 Session(app)
-
-#global
-num_jpgs = 256
+Compress(app)
 
 def login_required(f):
     @wraps(f)
