@@ -149,6 +149,9 @@ def create_study():
 @app.route('/studies/', methods=['GET'])
 @login_required
 def display_studies(error=''):
+    if (g.currentUser.acctype == 'Tech'):
+        return redirect('/') # Techs don't need access to studies
+
     cursor = g.db.cursor()
     cursor.execute("SELECT s.name, s.id, s.created_on, num_sessions, u.name, COUNT(i.id)  "
                    "FROM users u, studies s LEFT JOIN image_sets i ON study = s.name "
