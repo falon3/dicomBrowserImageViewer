@@ -177,8 +177,11 @@ def expand_study(name):
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):
-    studies = Study.getAll()
-    return render_template('upload.html', title= "Upload Dicom", studies = studies, error=error)
+    study_select = request.args.get('study')
+    studies = Study.getAllNames()
+    if study_select not in studies:
+        study_select = ''
+    return render_template('upload.html', title= "Upload Dicom", studies = studies, error=error, study_select = study_select)
 
 # handles uploading Dicom files, converting into jpg format and storing into database
 @app.route('/upload/', methods=['POST'])

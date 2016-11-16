@@ -28,6 +28,17 @@ class Study:
             return Study(id, name, created_on, num_sessions, user_id)
         except:
             return Study()
+       
+    @staticmethod
+    def getAllNames():
+        try:
+            cursor = g.db.cursor()
+            cursor.execute("SELECT name FROM studies")
+            data = cursor.fetchall()
+            names = [str(name[0]) for name in data]
+            return names
+        except:
+            return []
             
     @staticmethod
     def getAll():

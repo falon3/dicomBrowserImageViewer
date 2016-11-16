@@ -5,9 +5,14 @@
 <form enctype="multipart/form-data" method="post" action="{{ url_for('upload') }}">
         <label for="filename"> Please enter a name for the set of images: </label>
         <select name="study"  id="study"> Select study
-            <option selected="selected" disabled="disabled">Select a Study</option>
+            {% if study_select == '' %}
+                <option selected="selected" disabled="disabled">Select a Study</option>
+            {% else %}
+                <option selected="selected" >{{study_select}}</option>
+            {% endif %}
+
             {% for study in studies %}
-            <option value="{{ study.name }}">{{ study.name }}</option>
+            <option value="{{ study }}">{{ study }}</option>
             {% endfor %}
         </select>
         <input type="text" name= "filename" id="filename" required /><br/>
