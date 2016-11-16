@@ -434,3 +434,14 @@ table.dataTable td {
 th.ui-state-default {
     border-color: #393939 !important;
 }
+
+tr.expanded div {
+    margin-left: 25px;
+    font-size: small;
+}
+
+tr.expanded table tr, tr.expanded table td, tr.expanded table th {
+    background: transparent !important;
+    border: 1px solid #191919;
+}
+

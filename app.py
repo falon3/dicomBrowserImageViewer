@@ -265,7 +265,6 @@ def upload():
 def query_set(set_id, name):
     imageset = ImageSet.newFromId(set_id)
     imgs = imageset.getImages()
-    print(imgs)
     first = imgs[0].id
     size = len(imgs)
     return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
