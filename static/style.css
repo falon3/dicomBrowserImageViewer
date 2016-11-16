@@ -343,17 +343,64 @@ img#slice {
 /* DataTable customizations */
 
 button#addToStudyButton {
-  width: 50px;
-  height:20px;
-  border-radius: 10px;
-  text-shadow: 0px 0px 0px #666666;
-  font-family: Arial;
-  color: #2a2b2b;
-  font-size: 10px;
-  background: #34d965;
-  padding: 6px 7px 6px 7px;
-  text-decoration: none;
+  /* width: 50px; */
+  /* height:20px; */
+  /* border-radius: 10px; */
+  /* text-shadow: 0px 0px 0px #666666; */
+  /* font-family: Arial; */
+  /* color: #2a2b2b; */
+  /* font-size: 10px; */
+  /* background: #34d965; */
+  /* padding: 6px 7px 6px 7px; */
+  /* text-decoration: none; */
+  /* float: right; */
+
+   background: #555555;
+    color: #fff;
+    display: inline-block;
+    padding: 0 ;
+    font-size: 40px;
+    line-height: 0.1em;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    font-weight: 800;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    text-transform: capitalize;
+    border: 0;
+    cursor: pointer;
+    text-align: center;
+    float: right;
+}
+
+button#addToStudyButton:hover {
+    background: #198ad1;
+}
+
+button#addToStudyButton:hover,
+button#addToStudyButton.delete:hover {
+  color: #272727;
+  right: 60px;
+}
+button#addToStudyButton:hover:before {
+  content: 'Add Photos';
   float: right;
+  color: #989898;
+  font-size: 12px;
+  right: 0px;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: center;
+}
+button#addToStudyButton.delete:hover:before {
+  content: 'Add Photos';
+  float: right;
+  color: #989898;
+  font-size: 12px;
+  right: 22px;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: center;
 }
 
 table.dataTable.no-footer {
