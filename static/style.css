@@ -176,6 +176,14 @@ div#viewerContainer.fullscreen {
     left: 0;
 }
 
+div#stl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
 div#topViewer {
     min-width: 500px;
     text-align: left;

@@ -161,6 +161,17 @@ Viewer = Backbone.View.extend({
         e.preventDefault();
     },
     
+    showSTL: function(){
+        if($('#stl').is(":visible")){
+            $('#stl').empty();
+            $('#stl').hide();
+        }
+        else{
+            $('#stl').show();
+            init('/static/us_holder_pt2.stl', $('#stl'));
+        }
+    },
+    
     // Toggles whether or not to go full screen
     toggleFullScreen: function(){
         this.$("#viewerContainer").toggleClass("fullscreen");
@@ -292,6 +303,7 @@ Viewer = Backbone.View.extend({
         "click #next": "next",
         "input #slider": "setImage",
         "change #curved": "changeSegments",
+        "click #showSTL": "showSTL",
         "click #fullscreen a": "toggleFullScreen",
         "click #sessions > div": "clickSession",
         "click #addSession": "addSession",
