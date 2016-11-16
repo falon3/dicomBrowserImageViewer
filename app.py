@@ -150,12 +150,12 @@ def create_study():
 @login_required
 def display_studies(error=''):
     cursor = g.db.cursor()
-    cursor.execute("SELECT s.name, s.id, s.created_on, num_sessions, u.name  "
-                   "FROM studies s, users u "
+    cursor.execute("SELECT s.name, s.id, s.created_on, num_sessions, u.name, COUNT(i.id)  "
+                   "FROM users u, studies s LEFT JOIN image_sets i ON study = s.name "
                    "WHERE s.user_id = u.id "
                    "GROUP BY s.id")
     data = cursor.fetchall()
-    study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4] } for study in data}
+    study_dict = {str(study[0]): {'id': study[1], 'created_on': study[2], 'num_sessions': study[3], 'creator': study[4], 'count':study[5] } for study in data}
 
     return render_template('studies.html', title='Studies', error=error, result = study_dict)  
 

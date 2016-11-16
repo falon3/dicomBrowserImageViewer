@@ -2,25 +2,32 @@
 
 {% block content %}
 <script type="text/javascript" src="{{ url_for('static', filename='scripts/studyExpand.js') }}"></script>
+
+<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
 {% if g.currentUser.acctype == 'Researcher' %}   
     <button onclick="location.href = '/studies/create/';" id="studybutton" class="float-left submit-button" >Create New Study</button>
 {% endif %}
-<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
 <br><br>
 <table class="display" width="100%" cellspacing="0" id="studyTable">  
     <thead>  
         <tr>
             <th>Study Name</th>
             <th>Creator</th>
-            <th width="130">max # sessions</th>
+            <th width="100"># DICOMs</th>
+            <th width="120">max # sessions</th>
             <th width="250">Date Created</th>
         </tr>
     </thead>
     <tbody>
         {% for key, value in result.iteritems() %}
         <tr id="{{key}}">
-            <td > <a class="LoadStudyDicoms" style="font-size:23px; color:#ffff; text-decoration:none;" href="/studies/{{ key }}">&#8853;</a> {{ key }} </td>
+            <td > 
+                {% if value['count'] > 0 %}
+                <a class="LoadStudyDicoms" style="font-size:23px; color:#ffff; text-decoration:none;" href="/studies/{{ key }}">&#8853;</a>
+                {% endif %}
+                {{ key }} </td>
             <td align="center"> {{ value['creator'] }} </td>
+            <td align="center"> {{ value['count'] }} </td>
             <td align="center"> {{ value['num_sessions'] }} </td>
             <td align="center"> {{ value['created_on'] }}</td>
         </tr>
@@ -29,3 +36,10 @@
 </table>
 
 {% endblock %}
+
+<tr class='group'><a style='color:#8888; text-decoration:none;' href='/viewset/79:nowTWO-IM_0033'>
+    <td>preview</td>
+    <td>nowTWO-IM_0033</td>
+    <td>2016-11-09 15:24:06</td>
+</a></tr>
+<tr class='group'><a style='color:#8888; text-decoration:none;' href='/viewset/78:nowTWO-IM_0032'><td>preview</td><td>nowTWO-IM_0032</td><td>2016-11-09 15:24:02</td></a></tr>1studyExpand.js:20:29

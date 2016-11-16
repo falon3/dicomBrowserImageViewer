@@ -10,10 +10,11 @@ $(document).ready(function(){
                         var expand_rows = "";
                         study_details = expansion[$(rows).eq(i).attr("id")]
                         console.log(study_details);
-                        if (study_details != undefined){
+                        if (!_.isEmpty(study_details)){
                             for (key in study_details){
-                                expand_rows += "<tr class='group'><td>preview</td>"
-                                expand_rows += "<td> <a style='color:#8888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>" + key + "</a></td>";
+                                linktag="<a style='color:#888888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>"
+                                expand_rows += "<tr class='group'><td>"+linktag+"preview</a></td>";
+                                expand_rows += "<td>" + linktag + key + "</a></td>";
                                 var date = study_details[key].timestamp;
                                 expand_rows+= "<td>"+date+"</td></tr>"
                             }
@@ -40,7 +41,7 @@ $(document).ready(function(){
             table.draw();
             return     
         }
-        else{
+        else {
             $(this).html("&#8854;");
         }
         
