@@ -234,7 +234,7 @@ function init(stl, el) {
     //xhr.setRequestHeader('charset', 'x-user-defined');
     xhr.send( null );
     
-    renderer = new THREE.WebGLRenderer(); //new THREE.CanvasRenderer();
+    renderer = new THREE.WebGLRenderer({ antialias: true }); //new THREE.CanvasRenderer();
     renderer.setSize( $(el).width(), $(el).height() );
     $(el).html(renderer.domElement);
 }
