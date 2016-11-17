@@ -10,7 +10,7 @@ $(document).ready(function(){
             api.column(0, {page:'current'} ).data().each( function ( group, i ) {
                 var expand_rows = "";
                 var id = $(rows).eq(i).attr("id")
-                study_details = expansion[id];
+                var study_details = expansion[id];
                 if (!_.isEmpty(study_details)){
                     for (key in study_details){
                         linktag="<a style='color:#888888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>"
@@ -18,7 +18,7 @@ $(document).ready(function(){
                         expand_rows += "<td>" + linktag + key + "</a></td>";
                         var date = study_details[key].timestamp;
                         expand_rows += "<td>"+date+"</td>"
-                        expand_rows += "<td id='eraseIcon'>⌫</td></tr>"
+                        expand_rows += "<td id='"+key+"'><button id='eraseIcon'><img style='width:20px; height:20px;' src='/static/BinIcon.png'></button></td></tr>"
                     }
                     var className = $(rows).eq(i).attr("class");
                     var element = $('<tr class="expanded ' + 
@@ -31,8 +31,15 @@ $(document).ready(function(){
                                     expand_rows +
                                     '</table></div></td></tr>');
                     $(rows).eq(i).after(element);
+                    $("#eraseIcon", element).click(function(event) {
+                        var keyName = $(this).parent().attr("id")
+                        alert(keyName);
+                        alert(study_details[keyName].id);
+                        
+                    });
                 }
             });
+            
                      
         }
     });
