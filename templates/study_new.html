@@ -6,7 +6,7 @@
     <label for="Name"> Please enter a name for the Study: </label>
     <input type="text" name= "name" id="name" required /><br/>
     <label for="sessions"> # Sessions per Participant </label>
-    <input type="number" name= "sessions" id="sessions" required><br/>
+    <input type="number" min="1" name= "sessions" id="sessions" required><br/>
     <input type="submit" value="Create Study" id="createStudy"/>
 </form>
 {% endblock %}

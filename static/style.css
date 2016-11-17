@@ -373,7 +373,6 @@ button#addToStudyButton:hover {
     background: #198ad1;
 }
 
-button#addToStudyButton:hover,
 button#addToStudyButton.delete:hover {
   color: #272727;
   right: 60px;
@@ -399,7 +398,7 @@ button#addToStudyButton.delete:hover:before {
   text-align: center;
 }
 
-button#deleteStudy {
+button.deleteStudy {
     background: #555555;
     color: #fff;
     display: inline-block;
@@ -418,16 +417,15 @@ button#deleteStudy {
     float: right; !important
 }
 
-button#deleteStudy:hover {
+button.deleteStudy:hover {
     background: #198ad1;
 }
 
-button#addToStudyButton:hover,
-button#deleteStudy.delete:hover {
+button.deleteStudy.delete:hover {
   color: #272727;
   right: 60px;
 }
-button#deleteStudy:hover:before {
+button.deleteStudy:hover:before {
   content: 'Erase Study';
   float: right;
   color: #E81C15;
@@ -437,7 +435,7 @@ button#deleteStudy:hover:before {
   vertical-align: middle;
   text-align: center;
 }
-button#deleteStudy.delete:hover:before {
+button.deleteStudy.delete:hover:before {
   content: 'Erase Study';
   float: right;
   color: #E81C15;
@@ -500,7 +498,7 @@ tr.expanded table{
     border: 2px solid #7E8E96;
 }
 
-button#eraseIcon {
+button.eraseIcon {
     background: #555555;
     color: #fff;
     display: inline-block;
@@ -514,18 +512,18 @@ button#eraseIcon {
     float: right; !important
 }
 
-button#eraseIcon:hover {
+button.eraseIcon:hover {
     background: #198ad1;
 }
 
-button#eraseIcon:hover:before {
+button.eraseIcon:hover:before {
   display: inline-block;
   color: #E81C15;
   padding: 0;
   line-height: normal;
   vertical-align: middle;
 }
-button#eraseIcon.delete:hover:before {
+button.eraseIcon.delete:hover:before {
   display: inline-block;
   color: #E81C15;
   padding: 0;
