@@ -1,6 +1,6 @@
 $(document).ready(function(){
     var expansion = {};
-    
+
     // handles the expansions rows within the main table
     var table = $("#studyTable").DataTable({
         "drawCallback": function ( settings ) {
@@ -14,12 +14,18 @@ $(document).ready(function(){
                 var study_details = expansion[id];
                 if (!_.isEmpty(study_details)){
                     for (key in study_details){
-                        linktag="<a style='color:#888888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>"
-                        expand_rows += "<tr class='group'><td>"+linktag+"preview</a></td>";
+                        var linktag ="<a style='color:#888888; text-decoration:none;' href='/viewset/"+study_details[key].id+":"+key+"'>";
+                        var thumbnail_link = "/upload/"+study_details[key].index;
+
+                        expand_rows += "<tr class='group'><td>"+linktag+"<img style='max-width:100px; max-height: 100px;' src='"+thumbnail_link+"' /></a></td>";
                         expand_rows += "<td>" + linktag + key + "</a></td>";
                         var date = study_details[key].timestamp;
                         expand_rows += "<td>"+date+"</td>"
-                        expand_rows += "<td id='"+key+"'><button class='eraseIcon'><img style='width:20px; height:20px;' src='/static/BinIcon.png'></button></td></tr>"
+                        expand_rows += "<td id='"+key+"'>"
+                        if (currentUser.Type == 'Researcher'){
+                            expand_rows += "<button class='eraseIcon'><img style='width:20px; height:20px;' src='/static/BinIcon.png'></button>"
+                        }
+                        expand_rows+= "</td></tr>"
                     }
                     var className = $(rows).eq(i).attr("class");
                     var element = $('<tr class="expanded ' + 

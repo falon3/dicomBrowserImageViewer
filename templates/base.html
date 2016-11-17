@@ -5,6 +5,7 @@
         <title>{{ title }}</title>
         {% include 'styles.html' %}
         {% include 'scripts.html' %}
+        <script type="text/javascript"> var currentUser ={ 'Name': '{{ g.currentUser.name }}', 'Type': '{{g.currentUser.acctype}}', 'Id':'{{g.currentUser.userID}}' }</script>
     </head>
     <body>
         <div id="container">

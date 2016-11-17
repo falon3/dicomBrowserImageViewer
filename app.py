@@ -166,12 +166,14 @@ def display_studies(error=''):
 @login_required
 def expand_study(name):
      cursor = g.db.cursor()
-     cursor.execute("SELECT i.name, i.id, i.created_on "
-                    "FROM image_sets i, studies s "
+     cursor.execute("SELECT i.name, i.id, i.created_on, COUNT(*), MIN(im.id) as start "
+                    "FROM image_sets i, images im "
                     "WHERE i.study = %s "
+                    "AND im.set_id = i.id "
+                    "AND i.study IS NOT NULL "
                     "GROUP BY i.name", (name))
      data = cursor.fetchall()
-     img_dict = {str(dcm[0]): {'id':dcm[1], 'timestamp': str(dcm[2]) } for dcm in data}
+     img_dict = {str(dcm[0]): {'id':dcm[1], 'timestamp': str(dcm[2]), 'index': int(dcm[4] + dcm[3]/2) } for dcm in data}
      response = make_response(json.dumps(img_dict))
      response.headers['Content-Type'] = 'application/json'
      return response
@@ -212,7 +214,7 @@ def delete_DICOM(set_id):
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):
-    if (g.currentUser.acctype != 'Researcher' or 'Tech'):
+    if (g.currentUser.acctype == 'Participant'):
         err = "You don't have permissions to upload"
         return index(err)
     study_select = request.args.get('study')
@@ -225,7 +227,7 @@ def load_upload_page(error=''):
 @app.route('/upload/', methods=['POST'])
 @login_required
 def upload():
-    if (g.currentUser.acctype != 'Researcher' or 'Tech'):
+    if (g.currentUser.acctype == 'Participant'):
         err = "You don't have permissions to upload"
         return index(err)
     setname = request.form.get('filename')
@@ -301,7 +303,7 @@ def upload():
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
 def query_set(set_id, name):
-    if (g.currentUser.acctype != 'Researcher' or 'Participant'):
+    if (g.currentUser.acctype == 'Tech'):
         return redirect('/')
     imageset = ImageSet.newFromId(set_id)
     imgs = imageset.getImages()
@@ -377,7 +379,6 @@ def newUser():
         # to do check if valid and store in database
         # validate cookies and set current
     except Exception as e:
-        print("USER not saved into db: " + str(e))
         err = e[1]
         err_entry = err.split()[2]
         if "Duplicate" in err and "name" in err:
