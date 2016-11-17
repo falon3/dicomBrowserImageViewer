@@ -1,6 +1,6 @@
 // https://github.com/tonylukasavage/jsstl/blob/master/index.html
 
-var camera, scene, renderer,
+var camera, controls, scene, renderer,
 geometry, material, mesh, light1, stats;
 
 function trim (str) {
@@ -175,18 +175,41 @@ var parseStl = function(stl) {
 };
 
 function init(stl, el) {
-    //Detector.addGetWebGLMessage();
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 75, $(el).width() / $(el).height(), 1, 10000 );
     camera.position.z = 70;
     camera.position.y = 0;
+    
+    controls = new THREE.TrackballControls( camera );
+	controls.rotateSpeed = 5.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 2.0;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.keys = [ 65, 83, 68 ];
+	controls.addEventListener( 'change', render );
+    
     scene.add( camera );
-    var directionalLight = new THREE.DirectionalLight( 0xffffff );
-    directionalLight.position.x = 0; 
-    directionalLight.position.y = 0; 
-    directionalLight.position.z = 1; 
-    directionalLight.position.normalize();
-    scene.add( directionalLight );
+    
+    var directionalLight1 = new THREE.DirectionalLight( 0xaaaaaa );
+    directionalLight1.position.x = 0; 
+    directionalLight1.position.y = 0; 
+    directionalLight1.position.z = 1; 
+    directionalLight1.position.normalize();
+    
+    var directionalLight2 = new THREE.DirectionalLight( 0xaaaaaa );
+    directionalLight2.position.x = 0; 
+    directionalLight2.position.y = 0; 
+    directionalLight2.position.z = -1; 
+    directionalLight2.position.normalize();
+    
+    ambientlight = new THREE.AmbientLight( 0x222222 );
+				
+    scene.add( ambientlight );
+    scene.add( directionalLight1 );
+    scene.add( directionalLight2 );
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if ( xhr.readyState == 4 ) {
@@ -209,6 +232,7 @@ function init(stl, el) {
     //xhr.setRequestHeader("Content-Type","text/plain");
     //xhr.setRequestHeader('charset', 'x-user-defined');
     xhr.send( null );
+    
     renderer = new THREE.WebGLRenderer(); //new THREE.CanvasRenderer();
     renderer.setSize( $(el).width(), $(el).height() );
     $(el).html(renderer.domElement);
@@ -217,14 +241,14 @@ function init(stl, el) {
 function animate() {
     // note: three.js includes requestAnimationFrame shim
     requestAnimationFrame( animate );
-    render();
+    controls.update();
 }
 
 function render() {
     if(renderer != undefined){
-        if (mesh) {
-            mesh.rotation.z += 0.02;
-        }
+        //if (mesh) {
+        //    mesh.rotation.z += 0.02;
+        //}
         //light1.position.z -= 1;
         renderer.render( scene, camera );
     }
