@@ -1,0 +1,13 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+    /* Image Sets */
+    ALTER TABLE `image_sets` 
+    DROP FOREIGN KEY `fk_study`;
+    
+    ALTER TABLE `image_sets`
+    ADD CONSTRAINT fk_study FOREIGN KEY (study) REFERENCES studies(name) ON DELETE CASCADE;
+"""
+
+SQL_DOWN = u"""
+
+"""
