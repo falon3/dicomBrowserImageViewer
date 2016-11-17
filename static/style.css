@@ -201,12 +201,29 @@ div#middleViewer {
     margin: 15px;
 }
 
+div#viewerInstructions {
+    font-size: smaller;
+    display: inline-block;
+    width: 300px;
+    vertical-align: top;
+    
+}
+
+div#viewerInstructions table {
+    text-align: left;
+}
+
+div#viewerInstructions ul {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 15px;
+}
+
 div#sessionContainer {
     vertical-align: top;
     min-width: 300px;
     max-width: 300px;
     display: inline-block;
-    border-left: 1px solid #191919;
     padding-left: 10px;
 }
 
@@ -273,6 +290,11 @@ input#slider {
     bottom: 90px;
 }
 
+.fullscreen div#viewerInstructions {
+    position: absolute;
+    left: 0;
+}
+
 .fullscreen div#sessionContainer {
     position: absolute;
     top: 0;
@@ -301,7 +323,7 @@ div#fullscreen {
 canvas#canvas {
     position: absolute;
     top: 1px;
-    left: 1px;
+    margin-left: 1px;
 }
 
 img#slice {
