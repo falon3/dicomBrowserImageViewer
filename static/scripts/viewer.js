@@ -185,6 +185,9 @@ Viewer = Backbone.View.extend({
             this.$("#fullscreen img").attr("alt", "Full Screen");
             this.$("#fullscreen img").attr("title", "Full Screen");
         }
+        if($("#stl").is(":visible")){
+            init('/static/us_holder_pt2.stl', $('#stl'));
+        }
         this.render();
     },
     

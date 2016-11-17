@@ -219,6 +219,7 @@ function init(stl, el) {
                 parseStl(xhr.responseText);
                 mesh.rotation.x = 5;
                 mesh.rotation.z = .25;
+                render();
             }
         }
     }
