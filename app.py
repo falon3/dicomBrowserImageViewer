@@ -295,6 +295,8 @@ def upload():
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
 def query_set(set_id, name):
+    if g.currentUser.acctype == 'Tech':
+        return redirect('/')
     imageset = ImageSet.newFromId(set_id)
     imgs = imageset.getImages()
     first = imgs[0].id
