@@ -176,11 +176,16 @@ def expand_study(name):
      response.headers['Content-Type'] = 'application/json'
      return response
 
-@app.route('/studies/<name>', methods=['POST'])
+# handle deleting studies here (only for researchers)
+@app.route('/studies/<name>', methods=['DELETE'])
 @login_required    
 def delete_study(error=''):
-    pass
-    # handle deleting studies here (only for researchers)
+    if (g.currentUser.acctype != 'Researcher'):
+        err = "You don't have permissions to remove studies"
+        return redirect('/studies/', error= err)
+
+    study = newFromName(name)
+    
 
 @app.route('/upload/', methods=['GET'])
 @login_required

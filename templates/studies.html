@@ -27,7 +27,7 @@
                 {% endif %}
                 {{ key }} 
                 {% if g.currentUser.acctype == 'Researcher' %} 
-                <button onclick="location.href = '/study/{{key}}/delete';" id="deleteStudy" ><img style="width:20px; height:20px;" src="{{ url_for('static', filename='BinIcon.png') }}"></button>    
+                <button id="deleteStudy" ><img style="width:20px; height:20px;" src="{{ url_for('static', filename='BinIcon.png') }}"></button>    
                 {% endif %}
                 <button onclick="location.href = '/upload/?study={{key}}';" id="addToStudyButton" ><img style="width:15px; height:15px;" src="{{ url_for('static', filename='Upload.png') }}"></button></td>
             <td align="center"> {{ value['creator'] }} </td>

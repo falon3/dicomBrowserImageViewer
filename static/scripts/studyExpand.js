@@ -32,10 +32,11 @@ $(document).ready(function(){
                                     '</table></div></td></tr>');
                     $(rows).eq(i).after(element);
                     $("#eraseIcon", element).click(function(event) {
-                        var keyName = $(this).parent().attr("id")
-                        alert(keyName);
-                        alert(study_details[keyName].id);
-                        
+                        var keyName = $(this).parent().attr("id");
+                        if (window.confirm("Are you sure you want to delete " + keyName + "?")){
+                            removeDicom("/studies/"+keyname);
+                            alert(study_details[keyName].id);
+                        }
                     });
                 }
             });
@@ -43,8 +44,21 @@ $(document).ready(function(){
                      
         }
     });
-       
-        
+    
+    // Ajax call for delete Imageset
+    function removeDICOM(remove_url){
+                                $.ajax({
+                                    url: remove_url,
+                                    type: 'POST',
+                                    dataType: 'json'
+                                });
+    
+    // on click for the delete study icon
+    $("#deleteStudy").click(function(event) {
+        var studyName = $(this).parent().parent().attr("id");
+        window.confirm("Are you sure you want to delete the study "+ studyName +"?");
+    });
+    
     // on click expand or collapse the table row
     $(".LoadStudyDicoms").on("click", function(event) {
         event.preventDefault();
