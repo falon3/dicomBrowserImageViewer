@@ -175,7 +175,12 @@ def expand_study(name):
      response = make_response(json.dumps(img_dict))
      response.headers['Content-Type'] = 'application/json'
      return response
-    
+
+@app.route('/studies/<name>', methods=['POST'])
+@login_required    
+def delete_study(error=''):
+    pass
+    # handle deleting studies here (only for researchers)
 
 @app.route('/upload/', methods=['GET'])
 @login_required

@@ -351,19 +351,7 @@ img#slice {
 /* DataTable customizations */
 
 button#addToStudyButton {
-  /* width: 50px; */
-  /* height:20px; */
-  /* border-radius: 10px; */
-  /* text-shadow: 0px 0px 0px #666666; */
-  /* font-family: Arial; */
-  /* color: #2a2b2b; */
-  /* font-size: 10px; */
-  /* background: #34d965; */
-  /* padding: 6px 7px 6px 7px; */
-  /* text-decoration: none; */
-  /* float: right; */
-
-   background: #555555;
+    background: #555555;
     color: #fff;
     display: inline-block;
     padding: 0 ;
@@ -378,7 +366,7 @@ button#addToStudyButton {
     border: 0;
     cursor: pointer;
     text-align: center;
-    float: right;
+    float:inherit;
 }
 
 button#addToStudyButton:hover {
@@ -391,9 +379,9 @@ button#addToStudyButton.delete:hover {
   right: 60px;
 }
 button#addToStudyButton:hover:before {
-  content: 'Add Photos';
+  content: ' Add Photos';
   float: right;
-  color: #989898;
+  color: #F7F4F4;
   font-size: 12px;
   right: 0px;
   line-height: normal; 
@@ -401,15 +389,66 @@ button#addToStudyButton:hover:before {
   text-align: center;
 }
 button#addToStudyButton.delete:hover:before {
-  content: 'Add Photos';
+  content: ' Add Photos';
   float: right;
-  color: #989898;
+  color: #F7F4F4;
   font-size: 12px;
   right: 22px;
   line-height: normal; 
   vertical-align: middle;
   text-align: center;
 }
+
+button#deleteStudy {
+    background: #555555;
+    color: #fff;
+    display: inline-block;
+    padding: 0 ;
+    font-size: 40px;
+    line-height: 0 ;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    font-weight: 800;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    text-transform: capitalize;
+    border: 0;
+    cursor: pointer;
+    text-align: center;
+    float: right; !important
+}
+
+button#deleteStudy:hover {
+    background: #198ad1;
+}
+
+button#addToStudyButton:hover,
+button#deleteStudy.delete:hover {
+  color: #272727;
+  right: 60px;
+}
+button#deleteStudy:hover:before {
+  content: 'Erase Study';
+  float: right;
+  color: #E81C15;
+  font-size: 12px;
+  right: 0px;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: center;
+}
+button#deleteStudy.delete:hover:before {
+  content: 'Erase Study';
+  float: right;
+  color: #E81C15;
+  font-size: 12px;
+  right: 22px;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: center;
+}
+
+
 
 table.dataTable.no-footer {
     border-bottom: none;
@@ -444,12 +483,63 @@ th.ui-state-default {
 }
 
 tr.expanded div {
-    margin-left: 25px;
+    width: 70%;
+    background: #2020;
+    margin-left: 10%;
     font-size: small;
+    border-color: #5D727D !important;
 }
 
 tr.expanded table tr, tr.expanded table td, tr.expanded table th {
     background: transparent !important;
-    border: 1px solid #191919;
+    border: 1px solid #7E8E96;
+    padding: 4px 8px;
 }
 
+tr.expanded table{
+    border: 2px solid #7E8E96;
+}
+
+tr.expanded table td#eraseIcon {
+    background: #555555;
+    color: #E81C15;
+    display: inline-block;
+    padding: 0 ;
+    font-size: 20px;
+    line-height: 1.3em;
+    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    text-transform: capitalize;
+    border: 0;
+    cursor: pointer;
+    text-align: center;
+    float: right;
+}
+
+tr.expanded table td#eraseIcon:hover {
+    background: #198ad1;
+}
+
+
+tr.expanded table td#eraseIcon:hover:before {
+  content: 'Delete DICOM?   ';
+  display: inline-block;
+  color: #E81C15;
+  font-size: 12px;
+  padding: 0;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: left;
+}
+tr.expanded table td#eraseIcon.delete:hover:before {
+  content: 'Delete DICOM?   ';
+  display: inline-block;
+  color: #E81C15;
+  font-size: 12px;
+  padding: 0;
+  line-height: normal; 
+  vertical-align: middle;
+  text-align: left;
+}

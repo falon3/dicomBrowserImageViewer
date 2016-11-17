@@ -1,5 +1,6 @@
 $(document).ready(function(){
     var expansion = {};
+    
     var table = $("#studyTable").DataTable({
         "drawCallback": function ( settings ) {
             var api = this.api();
@@ -16,21 +17,27 @@ $(document).ready(function(){
                         expand_rows += "<tr class='group'><td>"+linktag+"preview</a></td>";
                         expand_rows += "<td>" + linktag + key + "</a></td>";
                         var date = study_details[key].timestamp;
-                        expand_rows += "<td>"+date+"</td></tr>"
+                        expand_rows += "<td>"+date+"</td>"
+                        expand_rows += "<td id='eraseIcon'>⌫</td></tr>"
                     }
                     var className = $(rows).eq(i).attr("class");
-                    var element = $('<tr class="expanded ' + className + '"><td colspan="5" style="padding:0;"><div><table width="100%" cellspacing="1" rules="cols">' +
-                                      '<tr><th width="33%">Preview</th>' +
-                                      '<th width="33%">DICOM name</th>' +
-                                      '<th width="33%">Date Uploaded</th></tr>' +
-                                      expand_rows +
-                                  '</table></div></td></tr>');
+                    var element = $('<tr class="expanded ' + 
+                                    className + '">' +
+                                    '<td colspan="5" style="padding:0;"><div><table width="100%" cellspacing="1" rules="cols">' +
+                                    '<tr><th width="33%">Preview</th>' +
+                                    '<th width="33%">DICOM name</th>' +
+                                    '<th width="33%">Date Uploaded</th>' +
+                                    '<th width="20%"></th></tr>'+
+                                    expand_rows +
+                                    '</table></div></td></tr>');
                     $(rows).eq(i).after(element);
                 }
             });
+                     
         }
     });
-                
+       
+        
     // on click expand or collapse the table row
     $(".LoadStudyDicoms").on("click", function(event) {
         event.preventDefault();
