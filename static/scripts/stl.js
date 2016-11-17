@@ -183,10 +183,10 @@ function init(stl, el) {
     controls = new THREE.TrackballControls( camera );
 	controls.rotateSpeed = 5.0;
 	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 2.0;
+	controls.panSpeed = 1.0;
 	controls.noZoom = false;
 	controls.noPan = false;
-	controls.staticMoving = true;
+	controls.staticMoving = false;
 	controls.dynamicDampingFactor = 0.3;
 	controls.keys = [ 65, 83, 68 ];
 	controls.addEventListener( 'change', render );
@@ -251,3 +251,4 @@ function render() {
         renderer.render( scene, camera );
     }
 }
+animate();

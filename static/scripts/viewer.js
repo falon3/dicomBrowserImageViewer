@@ -169,7 +169,6 @@ Viewer = Backbone.View.extend({
         else{
             $('#stl').show();
             init('/static/us_holder_pt2.stl', $('#stl'));
-            animate();
         }
     },
     
