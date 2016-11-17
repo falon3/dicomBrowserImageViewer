@@ -2,8 +2,9 @@
 
 {% block content %}
 
-
+{% if g.currentUser.acctype != 'Participant' %}
 <button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
+{% endif %}
 
 {% if g.currentUser.acctype != 'Tech' %}      
 <button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >View Studies</button>
@@ -26,13 +27,14 @@
             <td align="center">
                 {% if g.currentUser.acctype != 'Tech' %}  
                 <a href="/viewset/{{ value['id'] }}:{{ key }}">
-                    {% endif %}
-                    <img style="max-width:150px; max-height: 150px;" src="/upload/{{ value['mid'] }}" /></a>
+                {% endif %}
+                
+                <img style="max-width:150px; max-height: 150px;" src="/upload/{{ value['mid'] }}" /></a>
             </td>
             <td> 
                 {% if g.currentUser.acctype != 'Tech' %}  
                 <a href="/viewset/{{ value['id'] }}:{{ key }}">
-                    {% endif %}{{ key }}</a>             
+                {% endif %}{{ key }}</a>             
             </td>
             <td> {{ value['study'] }} </td>
             <td> {{ value['timestamp'] }}</td>

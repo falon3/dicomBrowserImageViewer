@@ -78,7 +78,7 @@ def after_request(response):
 
 @app.route('/')
 @login_required
-def index():
+def index(err=''):
     setname = request.args.get("search")
     if not setname:
         setname = ''
@@ -117,7 +117,7 @@ def index():
     for key in img_dict:
         img_dict[key]['count'] = count_dict[key.split('-')[0]]
 
-    return render_template('userpictures.html', title='my images', result = img_dict, setname=setname)    
+    return render_template('userpictures.html', title='my images', result = img_dict, setname=setname, error=err)    
 
 @app.route('/studies/create/', methods=['GET'])
 @login_required
@@ -182,7 +182,7 @@ def expand_study(name):
 def delete_study(name):
     if (g.currentUser.acctype != 'Researcher'):
         err = "You don't have permissions to remove studies"
-        return redirect('/studies/', error= err)
+        return display_studies(err)
 
     study = Study.newFromName(name)
     study.delete()
@@ -196,7 +196,7 @@ def delete_study(name):
 def delete_DICOM(set_id):
     if (g.currentUser.acctype != 'Researcher'):
         err = "You don't have permissions to remove studies"
-        return redirect('/', error= err)
+        return display_studies(err)
 
     try:
         im_set = ImageSet.newFromId(set_id)
@@ -212,6 +212,9 @@ def delete_DICOM(set_id):
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):
+    if (g.currentUser.acctype != 'Researcher' or 'Tech'):
+        err = "You don't have permissions to upload"
+        return index(err)
     study_select = request.args.get('study')
     studies = Study.getAllNames()
     if study_select not in studies:
@@ -222,6 +225,9 @@ def load_upload_page(error=''):
 @app.route('/upload/', methods=['POST'])
 @login_required
 def upload():
+    if (g.currentUser.acctype != 'Researcher' or 'Tech'):
+        err = "You don't have permissions to upload"
+        return index(err)
     setname = request.form.get('filename')
     setname = re.sub('[^A-Za-z0-9]+', '', setname)
     imagefiles = request.files.getlist('imagefile')
@@ -295,7 +301,7 @@ def upload():
 @app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
 @login_required
 def query_set(set_id, name):
-    if g.currentUser.acctype == 'Tech':
+    if (g.currentUser.acctype != 'Researcher' or 'Participant'):
         return redirect('/')
     imageset = ImageSet.newFromId(set_id)
     imgs = imageset.getImages()
