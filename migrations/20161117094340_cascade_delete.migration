@@ -1,0 +1,55 @@
+#-*- coding:utf-8 -*-
+SQL_UP = u"""
+    /* Points */
+    ALTER TABLE `points`
+    DROP FOREIGN KEY `points_ibfk_1`;
+    
+    ALTER TABLE `points`
+    ADD CONSTRAINT `points_ibfk_1` FOREIGN KEY (`line_id`) REFERENCES `lines` (`id`) ON DELETE CASCADE;
+    
+    /* Lines */
+    ALTER TABLE `lines` 
+    DROP FOREIGN KEY `lines_ibfk_1`,
+    DROP FOREIGN KEY `lines_ibfk_2`;
+    
+    ALTER TABLE `lines`
+    ADD CONSTRAINT `lines_ibfk_1` FOREIGN KEY (`image_id`) REFERENCES `images` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `lines_ibfk_2` FOREIGN KEY (`session_id`) REFERENCES `sessions` (`id`) ON DELETE CASCADE;
+    
+    /* Sessions */
+    ALTER TABLE `sessions` 
+    DROP FOREIGN KEY `fk_study_id`,
+    DROP FOREIGN KEY `sessions_ibfk_1`,
+    DROP FOREIGN KEY `sessions_ibfk_2`;
+    
+    ALTER TABLE `sessions`
+    ADD CONSTRAINT `fk_study_id` FOREIGN KEY (`study_id`) REFERENCES `studies` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `sessions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+    
+    /* Images */
+    ALTER TABLE `images` 
+    DROP FOREIGN KEY `images_ibfk_1`;
+    
+    ALTER TABLE `images`
+    ADD CONSTRAINT `images_ibfk_1` FOREIGN KEY (`set_id`) REFERENCES `image_sets` (`id`) ON DELETE CASCADE;
+    
+    /* Image Sets */
+    ALTER TABLE `image_sets` 
+    DROP FOREIGN KEY `image_sets_ibfk_1`;
+    
+    ALTER TABLE `image_sets`
+    ADD CONSTRAINT `image_sets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+    
+    /* Studies */
+    ALTER TABLE `studies` 
+    DROP FOREIGN KEY `studies_ibfk_1`;
+    
+    ALTER TABLE `studies`
+    ADD CONSTRAINT `studies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+    
+"""
+
+SQL_DOWN = u"""
+
+"""
