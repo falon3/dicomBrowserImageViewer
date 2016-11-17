@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<script type="text/javascript" src="{{ url_for('static', filename='scripts/studyExpand.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/Study.js') }}"></script>
 
 <button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
 {% if g.currentUser.acctype == 'Researcher' %}   
