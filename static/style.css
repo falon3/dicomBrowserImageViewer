@@ -500,46 +500,35 @@ tr.expanded table{
     border: 2px solid #7E8E96;
 }
 
-tr.expanded table td#eraseIcon {
+button#eraseIcon {
     background: #555555;
-    color: #E81C15;
+    color: #fff;
     display: inline-block;
     padding: 0 ;
-    font-size: 20px;
-    line-height: 1.3em;
-    font-family: "Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    line-height: 0 ;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
-    text-transform: capitalize;
     border: 0;
     cursor: pointer;
-    text-align: center;
-    float: right;
+    float: right; !important
 }
 
-tr.expanded table td#eraseIcon:hover {
+button#eraseIcon:hover {
     background: #198ad1;
 }
 
-
-tr.expanded table td#eraseIcon:hover:before {
-  content: 'Delete DICOM?   ';
+button#eraseIcon:hover:before {
   display: inline-block;
   color: #E81C15;
-  font-size: 12px;
   padding: 0;
-  line-height: normal; 
+  line-height: normal;
   vertical-align: middle;
-  text-align: left;
 }
-tr.expanded table td#eraseIcon.delete:hover:before {
-  content: 'Delete DICOM?   ';
+button#eraseIcon.delete:hover:before {
   display: inline-block;
   color: #E81C15;
-  font-size: 12px;
   padding: 0;
-  line-height: normal; 
+  line-height: normal;
   vertical-align: middle;
-  text-align: left;
 }
