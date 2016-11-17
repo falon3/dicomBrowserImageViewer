@@ -169,7 +169,6 @@ Viewer = Backbone.View.extend({
         else{
             $('#stl').show();
             init('/static/us_holder_pt2.stl', $('#stl'));
-            animate();
         }
     },
     
@@ -185,6 +184,9 @@ Viewer = Backbone.View.extend({
             this.$("#fullscreen img").attr("src", "/static/fullScreen.png");
             this.$("#fullscreen img").attr("alt", "Full Screen");
             this.$("#fullscreen img").attr("title", "Full Screen");
+        }
+        if($("#stl").is(":visible")){
+            init('/static/us_holder_pt2.stl', $('#stl'));
         }
         this.render();
     },
