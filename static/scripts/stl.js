@@ -241,16 +241,13 @@ function init(stl, el) {
 function animate() {
     // note: three.js includes requestAnimationFrame shim
     requestAnimationFrame( animate );
-    controls.update();
+    if(controls != undefined){
+        controls.update();
+    }
 }
 
 function render() {
     if(renderer != undefined){
-        //if (mesh) {
-        //    mesh.rotation.z += 0.02;
-        //}
-        //light1.position.z -= 1;
         renderer.render( scene, camera );
     }
 }
-animate();
