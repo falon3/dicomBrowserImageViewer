@@ -165,6 +165,7 @@ Viewer = Backbone.View.extend({
         if($('#stl').is(":visible")){
             $('#stl').empty();
             $('#stl').hide();
+            controls.enabled = false;
         }
         else{
             $('#stl').show();
@@ -186,9 +187,8 @@ Viewer = Backbone.View.extend({
             this.$("#fullscreen img").attr("title", "Full Screen");
         }
         if($("#stl").is(":visible")){
-            init('/static/us_holder_pt2.stl', $('#stl'));
+            resizeSTL();
         }
-        this.render();
     },
     
     relMouseCoords: function(e){
