@@ -1,12 +1,11 @@
 #-*- coding:utf-8 -*-
 SQL_UP = u"""
-    /* Image Sets */
+    /* Lines */
     ALTER TABLE `lines` 
     ADD COLUMN number INTEGER;
 
     ALTER TABLE `lines`
     ADD UNIQUE(number, id);
-    
 """
 
 SQL_DOWN = u"""
