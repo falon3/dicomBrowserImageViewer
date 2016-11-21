@@ -177,11 +177,21 @@ div#viewerContainer.fullscreen {
 }
 
 div#stl {
+    background: #000000;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 1;
+}
+
+.fullscreen div#stl {
+    position: fixed;
+    top: 65px;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 div#topViewer {
@@ -199,6 +209,7 @@ div#middleViewer {
     position: relative; 
     display: inline-block;
     margin: 15px;
+    z-index: 1;
 }
 
 div#viewerInstructions {
@@ -206,7 +217,6 @@ div#viewerInstructions {
     display: inline-block;
     width: 300px;
     vertical-align: top;
-    
 }
 
 div#viewerInstructions table {

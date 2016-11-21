@@ -1,7 +1,7 @@
 // https://github.com/tonylukasavage/jsstl/blob/master/index.html
 
 var camera, controls, scene, renderer,
-geometry, material, mesh, light1, stats;
+geometry, material, mesh, light1, stats, stlEl;
 
 function trim (str) {
     str = str.replace(/^\s+/, '');
@@ -174,7 +174,15 @@ var parseStl = function(stl) {
     }
 };
 
+function resizeSTL(){
+    camera.aspect = $(stlEl).width() / $(stlEl).height();
+    camera.updateProjectionMatrix();
+    renderer.setSize( $(stlEl).width(), $(stlEl).height());
+    render();
+}
+
 function init(stl, el) {
+    stlEl = el;
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera( 75, $(el).width() / $(el).height(), 1, 10000 );
     camera.position.z = 70;
@@ -182,7 +190,9 @@ function init(stl, el) {
     
     controls = new THREE.TrackballControls( camera );
 	controls.rotateSpeed = 5.0;
-	controls.zoomSpeed = 1.2;
+	controls.zoomSpeed = 0.5;
+    controls.minDistance = 1;
+    controls.maxDistance = 1000;
 	controls.panSpeed = 1.0;
 	controls.noZoom = false;
 	controls.noPan = false;
@@ -190,6 +200,8 @@ function init(stl, el) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.keys = [ 65, 83, 68 ];
 	controls.addEventListener( 'change', render );
+	
+	window.addEventListener('resize', resizeSTL, false );
     
     scene.add( camera );
     
