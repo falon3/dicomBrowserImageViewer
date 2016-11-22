@@ -3,8 +3,8 @@
 {% block content %}
 <script type="text/javascript" src="{{ url_for('static', filename='scripts/Study.js') }}"></script>
 
-<button disabled id="viewStbutton" class="float-left submit-button" >view studies</button>
-<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >view images</button>
+<button disabled id="viewStbutton" class="float-left submit-button" style="background: #1075c0; color:white;" >studies</button>
+<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >images</button>
 {% if g.currentUser.acctype == 'Researcher' %}   
     <button onclick="location.href = '/studies/create/';" id="studybutton" class="submit-button" style="float:right;" >Create New Study</button>
 {% endif %}
@@ -44,5 +44,12 @@
         {% endfor %}
     </tbody>
 </table>
+{% if g.currentUser.acctype == 'Researcher' %}
+<div style="text-align:right; width:100%;">
+    <br>     
+    <button onclick="location.href = '/studies/create/';" id="studybutton" class="submit-button" " >Create New Study</button>
+</div>
+{% endif %}
+    
 
 {% endblock %}

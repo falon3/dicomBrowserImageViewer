@@ -4,8 +4,8 @@
 
 
 {% if g.currentUser.acctype != 'Tech' %}      
-<button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >View Studies</button>
-<button disabled id="viewImbutton" class="float-left submit-button" >view images</button>
+<button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >Studies</button>
+<button disabled id="viewImbutton" class="float-left submit-button" style="background: #1075c0; color:white;">images</button>
 {% endif %}
 
 {% if g.currentUser.acctype != 'Participant' %}
@@ -45,8 +45,15 @@
         {% endfor %}
     </tbody>
 </table>
+{% if g.currentUser.acctype != 'Participant' %}
+<div style="text-align:right; width:100%;">
+    <br>
+<button onclick="location.href = '/upload/';" id="uploadbutton" class="submit-button" >Upload Images</button>
+</div>
 <script type="text/javascript">
     $("#imageTable").DataTable({oSearch:{sSearch:"{{setname}}"}});
 </script>
+{% endif %}
+
 
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
+<button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >Studies</button>
+<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >images</button>
 <br><br>
     <div id="viewer" data-set_id="{{ imageset.id }}" data-num_sessions="{{ imageset.getStudy().num_sessions }}">
         <div id="viewerContainer">
