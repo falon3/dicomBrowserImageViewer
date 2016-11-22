@@ -3,9 +3,10 @@
 {% block content %}
 <script type="text/javascript" src="{{ url_for('static', filename='scripts/Study.js') }}"></script>
 
-<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >my images</button>
+<button disabled id="viewStbutton" class="float-left submit-button" >view studies</button>
+<button onclick="location.href = '/';" id="homebutton" class="float-left submit-button" >view images</button>
 {% if g.currentUser.acctype == 'Researcher' %}   
-    <button onclick="location.href = '/studies/create/';" id="studybutton" class="float-left submit-button" >Create New Study</button>
+    <button onclick="location.href = '/studies/create/';" id="studybutton" class="submit-button" style="float:right;" >Create New Study</button>
 {% endif %}
 <br><br>
 <table class="display" width="100%" cellspacing="0" id="studyTable">  

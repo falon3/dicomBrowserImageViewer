@@ -118,7 +118,7 @@ def index(err=''):
     for key in img_dict:
         img_dict[key]['count'] = count_dict[key.split('-')[0]]
 
-    return render_template('userpictures.html', title='my images', result = img_dict, setname=setname, error=err)    
+    return render_template('userpictures.html', title='Images', result = img_dict, setname=setname, error=err)    
 
 # STUDIES ROUTES
 @app.route('/studies/create/', methods=['GET'])

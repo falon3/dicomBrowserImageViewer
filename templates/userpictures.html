@@ -2,12 +2,14 @@
 
 {% block content %}
 
-{% if g.currentUser.acctype != 'Participant' %}
-<button onclick="location.href = '/upload/';" id="uploadbutton" class="float-left submit-button" >Upload Images</button>
-{% endif %}
 
 {% if g.currentUser.acctype != 'Tech' %}      
 <button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >View Studies</button>
+<button disabled id="viewImbutton" class="float-left submit-button" >view images</button>
+{% endif %}
+
+{% if g.currentUser.acctype != 'Participant' %}
+<button onclick="location.href = '/upload/';" id="uploadbutton" class="submit-button" style="float:right;" >Upload Images</button>
 {% endif %}
 
 <br><br>
