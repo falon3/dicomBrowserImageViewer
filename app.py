@@ -9,6 +9,7 @@ import subprocess
 import fnmatch
 import settings
 import re
+import api
 from utils import *
 from User import *
 from Point import *
@@ -16,7 +17,6 @@ from Line import *
 from StudySession import *
 from Study import *
 from ImageSet import *
-#import models
 import glob
 import datetime
 from base64 import decodestring
@@ -75,7 +75,11 @@ def after_request(response):
         g.db = None
     return response
 
-
+''' 
+home dashboard of pictures
+    # Techs only see what they uploaded, 
+    # participants only see what belongs to a study
+    # researchers see all'''
 @app.route('/')
 @login_required
 def index(err=''):
@@ -87,9 +91,6 @@ def index(err=''):
     
     cursor = g.db.cursor()
     # get all image set info to be displayed in table
-    # Techs only see what they uploaded, 
-    # participants only see what belongs to a study
-    # researchers see all
     qbuilder = "SELECT s.name, s.id, s.created_on, MIN(i.id) as start, s.study, COUNT(*) FROM image_sets s, images i WHERE i.set_id = s.id  "
 
     param = None
@@ -119,6 +120,7 @@ def index(err=''):
 
     return render_template('userpictures.html', title='my images', result = img_dict, setname=setname, error=err)    
 
+# STUDIES ROUTES
 @app.route('/studies/create/', methods=['GET'])
 @login_required
 def new_study(error=''):
@@ -192,7 +194,8 @@ def delete_study(name):
     response.headers['Content-Type'] = 'application/json'
     return response
 
-# handle deleting image_sets here (only for researchers)
+# Image Set routes #
+# handle deleting image_sets from studies template here (only for researchers)
 @app.route('/imgSet/<int:set_id>', methods=['DELETE'])
 @login_required    
 def delete_DICOM(set_id):
@@ -211,6 +214,19 @@ def delete_DICOM(set_id):
 
     return response
 
+# gets image set details from database to pass to template
+@app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
+@login_required
+def query_set(set_id, name):
+    if (g.currentUser.acctype == 'Tech'):
+        return redirect('/')
+    imageset = ImageSet.newFromId(set_id)
+    imgs = imageset.getImages()
+    first = imgs[0].id
+    size = len(imgs)
+    return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
+
+# Upload routes#
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):
@@ -298,30 +314,19 @@ def upload():
         remove(tempsaved+fullname) # delete original
 
     return redirect("/"+ "?search=" + setname , code=302)  
-    
-# gets image set details from database to pass to template
-@app.route('/viewset/<int:set_id>:<name>', methods=['GET'])
-@login_required
-def query_set(set_id, name):
-    if (g.currentUser.acctype == 'Tech'):
-        return redirect('/')
-    imageset = ImageSet.newFromId(set_id)
-    imgs = imageset.getImages()
-    first = imgs[0].id
-    size = len(imgs)
-    return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
-    
+
+#get image set from database
 @app.route('/upload/<int:img_id>', methods=['GET'])
 @login_required
 def get_image(img_id):
     try:
-        #get image set from database
         img = Image.newFromId(img_id, includeImage=True)
         return send_file(BytesIO(img.image), mimetype='image/jpg')
     except:
         filename = 'images/error.gif'
         return send_file(filename)
 
+# login and account routes #
 @app.route("/authenticate/", methods=['GET', 'POST'])
 def Authenticate():
     
@@ -338,11 +343,6 @@ def Authenticate():
     # get db connection cursor
     cursor = g.db.cursor()
     
-    # salt = uuid.uuid4().hex ## will need this to create accounts at some point
-    # #print(salt)
-    # hashed_password = hashlib.sha512(password + salt).hexdigest()
-    # print("pass: ", hashed_password)
-    # print("salt:", salt)
     err = "Incorrect Username or Password"
     try:
         cursor.execute("SELECT password, salt from users where name = %s", (username))
@@ -404,97 +404,37 @@ def Logout():
 @app.route("/api/point/<int:point_id>", methods=['GET', 'PUT', 'DELETE'])
 @login_required
 def apiPoint(point_id=None):
-    if(request.method == 'POST'):
-        point = Point(line_id = request.json.get('line_id'), 
-                      x = request.json.get('x'), 
-                      y = request.json.get('y'), 
-                      interpolated = 0)
-        point.create()
-    elif(request.method == 'PUT'):
-        point = Point.newFromId(point_id)
-        point.y = request.json.get('y')
-        point.x = request.json.get('x')
-        point.interpolated = 0
-        point.update()
-    elif(request.method == 'DELETE'):
-        point = Point.newFromId(point_id)
-        point.delete()
-    elif(request.method == 'GET'):
-        point = Point.newFromId(point_id)
-    response = make_response(point.toJSON())
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return api.apiPoint(point_id)
     
 @app.route("/api/line", methods=['POST'])
 @app.route("/api/line/<int:line_id>", methods=['GET', 'DELETE'])
 @login_required
-def apiLine(line_id=None):
-    if(request.method == 'POST'):
-        line = Line(image_id = request.json.get('image_id'), 
-                    session_id = request.json.get('session_id'), 
-                    color = request.json.get('color'))
-        line.create()
-    elif(request.method == 'DELETE'):
-        line = Line.newFromId(line_id)
-        line.delete()
-    elif(request.method == 'GET'):
-        line = Line.newFromId(line_id)
-    response = make_response(line.toJSON())
-    response.headers['Content-Type'] = 'application/json'
-    return response
+def apiLine(line_id = None):
+    return api.apiLine(line_id)
     
 @app.route("/api/session", methods=['POST'])
 @app.route("/api/session/<int:session_id>", methods=['GET', 'DELETE'])
 @login_required
 def apiSession(session_id=None):
-    if(request.method == 'POST'):
-        imageset = ImageSet.newFromId(request.json.get('set_id'))
-        study = Study.newFromName(imageset.study)
-        sessions = StudySession.getAll(imageset.id, study.id)
-        if(len(sessions) < study.num_sessions):
-            s = StudySession(set_id = imageset.id, 
-                             user_id = g.currentUser.userID,
-                             name = str(g.currentUser.name) + "." + str(imageset.name) + "." + str(study.name) + "-" + str(len(sessions)),
-                             color = request.json.get('color'),
-                             study_id = study.id)
-            s.create()
-        else:
-            s = StudySession()
-    elif(request.method == 'DELETE'):
-        s = StudySession.newFromId(session_id)
-        s.delete()
-    elif(request.method == 'GET'):
-        s = StudySession.newFromId(session_id)
-    response = make_response(s.toJSON())
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return api.apiSession(session_id)
 
 @app.route("/api/sessions/<int:set_id>/points", methods=['GET'])
 @app.route("/api/sessions/<int:set_id>/<int:study_id>/points", methods=['GET'])
 @login_required
 def apiPoints(set_id="%",study_id="%"):
-    points = Point.getAll(set_id, study_id)
-    response = make_response(json_encode_list(points))
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return api.apiPoints(set_id,study_id)
     
 @app.route("/api/sessions/<int:set_id>/lines", methods=['GET'])
 @app.route("/api/sessions/<int:set_id>/<int:study_id>/lines", methods=['GET'])
 @login_required
 def apiLines(set_id="%",study_id="%"):
-    lines = Line.getAll(set_id, study_id)
-    response = make_response(json_encode_list(lines))
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return api.apiLines(set_id,study_id)
 
 @app.route("/api/sessions/<int:set_id>", methods=['GET'])
 @app.route("/api/sessions/<int:set_id>/<int:study_id>", methods=['GET'])
 @login_required
 def apiSessions(set_id="%",study_id="%"):
-    s = StudySession.getAll(set_id, study_id)
-    response = make_response(json_encode_list(s))
-    response.headers['Content-Type'] = 'application/json'
-    return response
+    return api.apiSessions(set_id,study_id)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
