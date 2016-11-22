@@ -224,7 +224,7 @@ def query_set(set_id, name):
     imgs = imageset.getImages()
     first = imgs[0].id
     size = len(imgs)
-    return render_template('submit.html', title = imageset.name, imageset=imageset, first = first, size = size)
+    return render_template('viewer.html', title = imageset.name, imageset=imageset, first = first, size = size)
 
 # Upload routes#
 @app.route('/upload/', methods=['GET'])

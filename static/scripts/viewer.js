@@ -22,6 +22,10 @@ Viewer = Backbone.View.extend({
     initialize: function(){
         this.set_id = this.$el.attr("data-set_id");
         this.num_sessions = this.$el.attr("data-num_sessions");
+        console.log(this.num_sessions);
+        if(this.num_sessions < 1){
+            document.getElementById('addSession').style.visibility = 'hidden';
+            }
         this.slice = this.$("#slice");
         this.canvas = this.$("canvas")[0];
         this.context = this.canvas.getContext('2d');
@@ -70,7 +74,9 @@ Viewer = Backbone.View.extend({
             if(this.sessions.length == 0){
                 this.addSession();
             }
+            console.log(this.sessions);
             this.currentSession = this.sessions.at(0);
+            console.log(this.currentSession);
             this.renderUI();
             this.render();
         }, this));
