@@ -118,7 +118,9 @@ def index(err=''):
     for key in img_dict:
         img_dict[key]['count'] = count_dict[key.split('-')[0]]
 
-    return render_template('userpictures.html', title='Images', result = img_dict, setname=setname, error=err)    
+    all_studies = Study.getAllNames()
+        
+    return render_template('userpictures.html', title='Images', result = img_dict, setname=setname, studies = all_studies, error=err)    
 
 # STUDIES ROUTES
 @app.route('/studies/create/', methods=['GET'])
@@ -194,7 +196,7 @@ def delete_study(name):
     response.headers['Content-Type'] = 'application/json'
     return response
 
-# Image Set routes #
+# IMAGE SET routes #
 # handle deleting image_sets from studies template here (only for researchers)
 @app.route('/imgSet/<int:set_id>', methods=['DELETE'])
 @login_required    
@@ -226,7 +228,7 @@ def query_set(set_id, name):
     size = len(imgs)
     return render_template('viewer.html', title = imageset.name, imageset=imageset, first = first, size = size)
 
-# Upload routes#
+# UPLOAD routes#
 @app.route('/upload/', methods=['GET'])
 @login_required
 def load_upload_page(error=''):

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/study.js') }}"></script>
 {% if g.currentUser.acctype != 'Tech' %}      
 <button onclick="location.href = '/studies/';" id="viewStudies" class="float-left submit-button" >Studies</button>
 <button disabled id="viewImbutton" class="float-left submit-button" style="background: #1075c0; color:white;">images</button>
@@ -17,10 +17,10 @@
     <thead>  
         <tr>
             <th width="1%">Preview</th>
-            <th>DICOM name</th>
-            <th>Study</th>
-            <th>Date Uploaded</th>
-            <th># DICOMS in set</th>
+            <th width="40%">DICOM Name</th>
+            <th width="30%">Study Name</th>
+            <th width="8%"># in set</th>
+            <th width="20%">Date Uploaded</th>           
         </tr>
     </thead>
     <tbody>
@@ -33,14 +33,20 @@
                 
                 <img style="max-width:150px; max-height: 150px;" src="/upload/{{ value['mid'] }}" /></a>
             </td>
-            <td> 
+            <td align="center"> 
                 {% if g.currentUser.acctype != 'Tech' %}  
                 <a href="/viewset/{{ value['id'] }}:{{ key }}">
                 {% endif %}{{ key }}</a>             
             </td>
-            <td> {{ value['study'] }} </td>
-            <td> {{ value['timestamp'] }}</td>
-            <td align="right"> {{ value['count'] }} </td>
+            <td align="center" > 
+                {%if g.currentUser.acctype == 'Researcher' and not value['study'] %} 
+                <button id="addToStButton" onclick="pickStudy({{studies}})"><img style="width:15px; height:15px; " src="{{ url_for('static', filename='Add.png') }}"></button>         
+                {% endif %}
+                {{ value['study'] }} 
+                
+            </td>
+            <td align="center"> {{ value['count'] }} </td>
+            <td align="center"> {{ value['timestamp'] }}</td>         
         </tr>
         {% endfor %}
     </tbody>
