@@ -18,6 +18,8 @@ Viewer = Backbone.View.extend({
     slice: null,
     canvas: null,
     context: null,
+//this.currentSession.get("user_id");
+//currentUser.Type == 'Researcher'
 
     initialize: function(){
         this.set_id = this.$el.attr("data-set_id");
@@ -74,7 +76,7 @@ Viewer = Backbone.View.extend({
             if(this.sessions.length == 0){
                 this.addSession();
             }
-            console.log(this.sessions);
+            console.log(this.sessions.toJSON());
             this.currentSession = this.sessions.at(0);
             console.log(this.currentSession);
             this.renderUI();
@@ -105,6 +107,7 @@ Viewer = Backbone.View.extend({
         this.render();
     },
     
+//*
     // Deletes the selected point
     deletePoint: function(){
         var line = this.closeLine;
@@ -214,6 +217,7 @@ Viewer = Backbone.View.extend({
         this.render();
     },
     
+//*
     // Moving the mouse coordinates
     mouseMove: function(e){
         var coords = this.relMouseCoords(e);
@@ -226,7 +230,8 @@ Viewer = Backbone.View.extend({
         }
         this.render();
     },
-    
+
+//*    
     // Clicking the mouse button (both left/right)
     mouseDown: function(e){
         var coords = this.relMouseCoords(e);
@@ -286,7 +291,8 @@ Viewer = Backbone.View.extend({
         }
         this.render();
     },
-    
+
+//*    
     // Leaving the canvas area
     mouseLeave: function(e){
         if(!this.dragging){
@@ -294,7 +300,8 @@ Viewer = Backbone.View.extend({
         }
         this.render();
     },
-    
+
+//*    
     // Releasing the mouse button
     mouseUp: function(e){
         if(this.closePoint != null && 
@@ -321,7 +328,8 @@ Viewer = Backbone.View.extend({
         "mousedown #canvas": "mouseDown",
         "mouseleave #canvas": "mouseLeave",
     },
-    
+
+//* specific changes    
     renderUI: function(){
         // Changing the image
         this.slice.attr("src", this.currentSession.getImages().getCurrentImage().get('src'));
