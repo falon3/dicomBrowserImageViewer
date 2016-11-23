@@ -1,3 +1,5 @@
+# NOTE: this project has been moved to a private bitbucket repository and this code is now not up to date entirely. (November 23, 2016)
+
 # dicomBrowserImageViewer
 This is a web-based tool that allows dicom format(ultrasound/MRI) 3D images to be converted and viewed/scrolled in the browser. 
 
